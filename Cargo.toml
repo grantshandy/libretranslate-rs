@@ -7,8 +7,7 @@ license = "Apache-2.0"
 description = "Use Open Source Machine Translation"
 repository = "https://github.com/DefunctLizard/libretranslate-rs/"
 documentation = "https://docs.rs/libretranslate"
-keywords = ["translate", "language", "libretranslate", "machine translation"]
-categories = ["network-programming"]
+keywords = ["translate", "language", "libretranslate", "translation"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
