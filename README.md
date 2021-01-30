@@ -17,4 +17,4 @@ fn main() {
 }
 ```
 
-Written in Love, with Rust.
+Written with love, in Rust.
