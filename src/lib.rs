@@ -1,6 +1,24 @@
+//! libretranslate is a free, open source machine learning translation algorithm that can translate text between languages.
+//! libretranslate-rs allows you to use open source machine translation in your projects through an easy to use API.
+
+//! Using it is fairly simple:
+//! ```
+//! use libretranslate::Language;
+
+//! fn main() {
+//!     let input = "Open Source Machine Translation";
+
+//!     match libretranslate::translate(Language::English, Language::French, input) {
+//!         Ok(output) => println!("Translation of "{}" into French: {}", input, output),
+//!         Err(error) => println!("Translation error: {}", error),
+//!     };
+//! }
+//! ```
+//! Written with love, in Rust.
 use serde_json::Value;
 use std::fmt;
 
+/// Languages used for input and output of the translate function.
 #[derive(Debug)]
 pub enum Language {
     English,
@@ -14,6 +32,7 @@ pub enum Language {
     Spanish,
 }
 
+/// Errors that could be outputed by translate()
 #[derive(Debug, Clone)]
 pub enum TranslateError {
     HttpError(String),
@@ -35,6 +54,7 @@ impl fmt::Display for TranslateError {
     }
 }
 
+/// Translate text between two languages.
 pub fn translate(
     input_lang: Language,
     output_lang: Language,
