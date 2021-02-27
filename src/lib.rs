@@ -1,6 +1,6 @@
 //! A LibreTranslate API for Rust.
 //! ```
-//! libretranslate = "0.1.3"
+//! libretranslate = "0.1.4"
 //! ```
 //!
 //! libretranslate-rs allows you to use open source machine translation in your projects through an easy to use API that connects to the official webpage.
@@ -11,16 +11,17 @@
 //! use libretranslate::{translate, Language};
 //!
 //! fn main() {
-//!     let input = "Je te déteste!";
-//!     let language_input = Language::French;
+//!     let input = "Olá Mundo!";
+//!     let language_input = Language::Portuguese;
 //!     let language_output = Language::English;
 //!
-//!     println!("{}: {}", language_input, input);
-//!
-//!     match translate(language_input, language_output, input) {
-//!         Ok(output) => println!("{}: {}", language_output, output),
-//!         Err(error) => eprintln!("Translation error: {}", error),
+//!     let output = match translate(language_input, language_output, input) {
+//!         Ok(output) => output,
+//!         Err(error) => panic!("Translation error: {}", error),
 //!     };
+//!
+//!     println!("{}: {}", language_input.pretty(), input);
+//!     println!("{}: {}", language_output.pretty(), output);
 //! }
 //! ```
 //!
@@ -33,9 +34,8 @@
 //! Written with love, in Rust by Grant Handy.
 
 use serde_json::Value;
-use std::fmt;
 
-/// Languages used for input and output of the translate function.
+/// Languages that can used for input and output of the ['translate'] function.
 #[derive(Debug, Clone, Copy)]
 pub enum Language {
     English,
@@ -49,8 +49,40 @@ pub enum Language {
     Spanish,
 }
 
-impl fmt::Display for Language {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+impl Language {
+    // Return the language with the language code name. (ex. "ar", "de")
+    pub fn code(&self) -> &str {
+        match self {
+            Language::English => "en",
+            Language::Arabic => "ar",
+            Language::Chinese => "zh",
+            Language::French => "fr",
+            Language::German => "de",
+            Language::Italian => "it",
+            Language::Portuguese => "pt",
+            Language::Russain => "rs",
+            Language::Spanish => "es",
+        }
+    }
+
+    // Return the language with the full English name. (ex. "Arabic", "German")
+    pub fn pretty(&self) -> &str {
+        match self {
+            Language::English => "English",
+            Language::Arabic => "Arabic",
+            Language::Chinese => "Chinese",
+            Language::French => "French",
+            Language::German => "German",
+            Language::Italian => "Italian",
+            Language::Portuguese => "Portuguese",
+            Language::Russain => "Russain",
+            Language::Spanish => "Spanish",
+        }
+    }
+}
+
+impl std::fmt::Display for Language {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
             Language::English => write!(f, "en"),
             Language::Arabic => write!(f, "ar"),
@@ -65,7 +97,7 @@ impl fmt::Display for Language {
     }
 }
 
-/// Errors that could be outputed by translate()
+/// Errors that could be outputed by the translator.
 #[derive(Debug, Clone)]
 pub enum TranslateError {
     HttpError(String),
@@ -74,8 +106,8 @@ pub enum TranslateError {
 
 impl std::error::Error for TranslateError {}
 
-impl fmt::Display for TranslateError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+impl std::fmt::Display for TranslateError {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
             TranslateError::HttpError(error) => {
                 write!(f, "HTTP Request Error: {}", error.to_string())
@@ -88,52 +120,11 @@ impl fmt::Display for TranslateError {
 }
 
 /// Translate text between two languages.
-pub fn translate(
-    input_lang: Language,
-    output_lang: Language,
-    input: &str,
-) -> Result<String, TranslateError> {
-    let input_lang_str: String = match input_lang {
-        Language::English => "en".to_string(),
-        Language::Arabic => "ar".to_string(),
-        Language::Chinese => "zh".to_string(),
-        Language::French => "fr".to_string(),
-        Language::German => "de".to_string(),
-        Language::Italian => "it".to_string(),
-        Language::Portuguese => "pt".to_string(),
-        Language::Russain => "rs".to_string(),
-        Language::Spanish => "es".to_string(),
-    };
-
-    let output_lang_str: String = match output_lang {
-        Language::English => "en".to_string(),
-        Language::Arabic => "ar".to_string(),
-        Language::Chinese => "zh".to_string(),
-        Language::French => "fr".to_string(),
-        Language::German => "de".to_string(),
-        Language::Italian => "it".to_string(),
-        Language::Portuguese => "pt".to_string(),
-        Language::Russain => "rs".to_string(),
-        Language::Spanish => "es".to_string(),
-    };
-
-    let output = match translate_request(&input_lang_str, &output_lang_str, input) {
-        Ok(data) => data,
-        Err(error) => return Err(error),
-    };
-
-    Ok(output)
-}
-
-fn translate_request(
-    source: &str,
-    target: &str,
-    q: &str,
-) -> std::result::Result<String, TranslateError> {
+pub fn translate(source: Language, target: Language, input: &str) -> Result<String, TranslateError> {
     match ureq::post("https://libretranslate.com/translate").send_json(ureq::json!({
-        "q": q,
-        "source": source,
-        "target": target,
+        "q": input,
+        "source": source.code(),
+        "target": target.code(),
     })) {
         Ok(data) => {
             let string: String = match data.into_string() {
@@ -150,8 +141,8 @@ fn translate_request(
                 }
             };
 
-            let text = match &parsed_json["translatedText"] {
-                Value::String(text) => text,
+            let output = match &parsed_json["translatedText"] {
+                Value::String(output) => output,
                 _ => {
                     return Err(TranslateError::ParseError(String::from(
                         "Unable to find translatedText in parsed JSON",
@@ -159,7 +150,7 @@ fn translate_request(
                 }
             };
 
-            return Ok(text.to_string());
+            return Ok(output.to_string());
         }
         Err(error) => return Err(TranslateError::HttpError(error.to_string())),
     };
