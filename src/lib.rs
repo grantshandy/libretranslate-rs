@@ -1,6 +1,6 @@
 //! A LibreTranslate API for Rust.
 //! ```
-//! libretranslate = "0.1.5"
+//! libretranslate = "0.1.6"
 //! ```
 //!
 //! libretranslate-rs allows you to use open source machine translation in your projects through an easy to use API that connects to the official webpage.
@@ -50,7 +50,7 @@ pub enum Language {
 }
 
 impl Language {
-    // Return the language with the language code name. (ex. "ar", "de")
+    /// Return the language with the language code name. (ex. "ar", "de")
     pub fn code(&self) -> &str {
         match self {
             Language::English => "en",
@@ -65,7 +65,7 @@ impl Language {
         }
     }
 
-    // Return the language with the full English name. (ex. "Arabic", "German")
+    /// Return the language with the full English name. (ex. "Arabic", "German")
     pub fn pretty(&self) -> &str {
         match self {
             Language::English => "English",
