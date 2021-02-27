@@ -9,20 +9,17 @@ libretranslate-rs allows you to use open source machine translation in your proj
 Using it is fairly simple:
 
 ```rust
-use libretranslate::{translate, Language};
+use libretranslate::{Translator, Language};
 
 fn main() {
     let input = "Olá Mundo!";
-    let language_input = Language::Portuguese;
-    let language_output = Language::English;
+    let source = Language::Portuguese;
+    let target = Language::English;
 
-    let output = match translate(language_input, language_output, input) {
-        Ok(output) => output,
-        Err(error) => panic!("Translation error: {}", error),
+    match Translator::translate(source, target, input) {
+        Ok(data) => println!("{}: {}\n{}: {}", data.source.pretty(), data.input, data.target.pretty(), data.output),
+        Err(error) => panic!("{}", error),
     };
-
-    println!("{}: {}", language_input.pretty(), input);
-    println!("{}: {}", language_output.pretty(), output);
 }
 ```
 

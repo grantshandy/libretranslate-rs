@@ -8,20 +8,17 @@
 //! Using it is fairly simple:
 //!
 //! ```rust
-//! use libretranslate::{translate, Language};
+//! use libretranslate::{Translator, Language};
 //!
 //! fn main() {
 //!     let input = "Olá Mundo!";
-//!     let language_input = Language::Portuguese;
-//!     let language_output = Language::English;
+//!     let source = Language::Portuguese;
+//!     let target = Language::English;
 //!
-//!     let output = match translate(language_input, language_output, input) {
-//!         Ok(output) => output,
-//!         Err(error) => panic!("Translation error: {}", error),
+//!     match Translator::translate(source, target, input) {
+//!         Ok(data) => println!("{}: {}\n{}: {}", data.source.pretty(), data.input, data.target.pretty(), data.output),
+//!         Err(error) => panic!("{}", error),
 //!     };
-//!
-//!     println!("{}: {}", language_input.pretty(), input);
-//!     println!("{}: {}", language_output.pretty(), output);
 //! }
 //! ```
 //!
@@ -119,39 +116,58 @@ impl std::fmt::Display for TranslateError {
     }
 }
 
-/// Translate text between two languages.
-pub fn translate(source: Language, target: Language, input: &str) -> Result<String, TranslateError> {
-    match ureq::post("https://libretranslate.com/translate").send_json(ureq::json!({
-        "q": input,
-        "source": source.code(),
-        "target": target.code(),
-    })) {
-        Ok(data) => {
-            let string: String = match data.into_string() {
-                Ok(data) => data,
-                Err(error) => {
-                    return Err(TranslateError::ParseError(error.to_string()));
-                }
-            };
+pub struct Translator {
+    pub source: Language,
+    pub target: Language,
+    pub input: String,
+    pub output: String,
+}
 
-            let parsed_json: Value = match serde_json::from_str(&string) {
-                Ok(parsed_json) => parsed_json,
-                Err(error) => {
-                    return Err(TranslateError::ParseError(error.to_string()));
-                }
-            };
+impl Translator {
+    /// Translate text between two languages.
+    pub fn translate(source: Language, target: Language, input: &str) -> Result<Self, TranslateError> {
+        match ureq::post("https://libretranslate.com/translate").send_json(ureq::json!({
+            "q": input,
+            "source": source.code(),
+            "target": target.code(),
+        })) {
+            Ok(data) => {
+                let string: String = match data.into_string() {
+                    Ok(data) => data,
+                    Err(error) => {
+                        return Err(TranslateError::ParseError(error.to_string()));
+                    }
+                };
 
-            let output = match &parsed_json["translatedText"] {
-                Value::String(output) => output,
-                _ => {
-                    return Err(TranslateError::ParseError(String::from(
-                        "Unable to find translatedText in parsed JSON",
-                    )))
-                }
-            };
+                let parsed_json: Value = match serde_json::from_str(&string) {
+                    Ok(parsed_json) => parsed_json,
+                    Err(error) => {
+                        return Err(TranslateError::ParseError(error.to_string()));
+                    }
+                };
 
-            return Ok(output.to_string());
-        }
-        Err(error) => return Err(TranslateError::HttpError(error.to_string())),
-    };
+                let output = match &parsed_json["translatedText"] {
+                    Value::String(output) => output,
+                    _ => {
+                        return Err(TranslateError::ParseError(String::from(
+                            "Unable to find translatedText in parsed JSON",
+                        )))
+                    }
+                };
+
+                let input = input.to_string();
+                let output = output.to_string();
+
+                let myself = Self {
+                    source,
+                    target,
+                    input,
+                    output,
+                };
+
+                return Ok(myself);
+            }
+            Err(error) => return Err(TranslateError::HttpError(error.to_string())),
+        };
+    }
 }
