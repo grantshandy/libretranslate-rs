@@ -1,6 +1,6 @@
 //! A LibreTranslate API for Rust.
 //! ```
-//! libretranslate = "0.1.4"
+//! libretranslate = "0.1.5"
 //! ```
 //!
 //! libretranslate-rs allows you to use open source machine translation in your projects through an easy to use API that connects to the official webpage.
@@ -27,8 +27,8 @@
 //!
 //! Output:
 //! ```
-//! fr: Je te déteste!
-//! en: I hate you!
+//! Portuguese: Olá Mundo!
+//! English: Hello world!
 //! ```
 //!
 //! Written with love, in Rust by Grant Handy.
