@@ -18,33 +18,15 @@ pub enum Language {
 impl fmt::Display for Language {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            Language::English => {
-                write!(f, "en")
-            }
-            Language::Arabic => {
-                write!(f, "ar")
-            }
-            Language::Chinese => {
-                write!(f, "zh")
-            }
-            Language::French => {
-                write!(f, "fr")
-            }
-            Language::German => {
-                write!(f, "de")
-            }
-            Language::Italian => {
-                write!(f, "it")
-            }
-            Language::Portuguese => {
-                write!(f, "pt")
-            }
-            Language::Russain => {
-                write!(f, "rs")
-            }
-            Language::Spanish => {
-                write!(f, "es")
-            }
+            Language::English => write!(f, "en"),
+            Language::Arabic => write!(f, "ar"),
+            Language::Chinese => write!(f, "zh"),
+            Language::French => write!(f, "fr"),
+            Language::German => write!(f, "de"),
+            Language::Italian => write!(f, "it"),
+            Language::Portuguese => write!(f, "pt"),
+            Language::Russain => write!(f, "rs"),
+            Language::Spanish => write!(f, "es"),
         }
     }
 }
