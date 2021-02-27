@@ -1,11 +1,14 @@
-use libretranslate::Language;
+use libretranslate::{translate, Language};
 
 fn main() {
-    let input = "Je t'deteste.";
-    println!("{}", input);
+    let input = "Je te déteste!";
+    let language_input = Language::French;
+    let language_output = Language::English;
 
-    match libretranslate::translate(Language::French, Language::English, input) {
-        Ok(output) => println!("{}", output),
-        Err(error) => println!("Translation error: {}", error),
+    println!("{}: {}", language_input, input);
+
+    match translate(language_input, language_output, input) {
+        Ok(output) => println!("{}: {}", language_output, output),
+        Err(error) => eprintln!("Translation error: {}", error),
     };
 }
