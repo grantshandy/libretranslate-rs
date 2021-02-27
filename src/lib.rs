@@ -1,6 +1,6 @@
 //! A LibreTranslate API for Rust.
 //! ```
-//! libretranslate = "0.1.6"
+//! libretranslate = "0.1.8"
 //! ```
 //!
 //! libretranslate-rs allows you to use open source machine translation in your projects through an easy to use API that connects to the official webpage.
@@ -57,7 +57,7 @@ impl Language {
             Language::German => "de",
             Language::Italian => "it",
             Language::Portuguese => "pt",
-            Language::Russain => "rs",
+            Language::Russain => "ru",
             Language::Spanish => "es",
         }
     }
@@ -88,7 +88,7 @@ impl std::fmt::Display for Language {
             Language::German => write!(f, "de"),
             Language::Italian => write!(f, "it"),
             Language::Portuguese => write!(f, "pt"),
-            Language::Russain => write!(f, "rs"),
+            Language::Russain => write!(f, "ru"),
             Language::Spanish => write!(f, "es"),
         }
     }
