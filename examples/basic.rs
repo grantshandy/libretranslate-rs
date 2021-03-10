@@ -6,7 +6,7 @@ fn main() {
     let target = Language::English;
 
     match Translator::translate(source, target, input) {
-        Ok(data) => println!("{}: {}\n{}: {}", data.source.pretty(), data.input, data.target.pretty(), data.output),
+        Ok(data) => println!("{}", data.output),
         Err(error) => panic!("{}", error),
     };
 }
