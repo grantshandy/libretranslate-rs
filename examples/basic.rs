@@ -1,12 +1,11 @@
 use libretranslate::{Translator, Language};
 
 fn main() {
-    let input = "Olá Mundo!";
     let source = Language::Portuguese;
-    let target = Language::English;
+    let target = Language::Japanese;
+    let input = "Olá Mundo!";
+    let output = Translator::translate(source, target, input).unwrap().output;
 
-    match Translator::translate(source, target, input) {
-        Ok(data) => println!("{}", data.output),
-        Err(error) => panic!("{}", error),
-    };
+    println!("Input {}: {}", source.pretty(), input);
+    println!("Output {}: {}", target.pretty(), output);
 }

@@ -2,8 +2,8 @@ use libretranslate::Language;
 
 // Here we demonstrate that we can use Language::from() to create languages from unknown variables such as user input.
 fn main() {
-    let lang: Language = Language::English;
-    let lang_parse: Language = "en".parse().unwrap();
+    let lang = Language::English;
+    let lang_parse = "english".parse::<Language>().unwrap();
 
 
     assert_eq!(lang, lang_parse);

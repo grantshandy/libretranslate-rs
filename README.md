@@ -1,32 +1,43 @@
 # libretranslate-rs
 A LibreTranslate API for Rust.
 ```
-libretranslate = "0.1.8"
+libretranslate = "0.1.9"
 ```
 
-libretranslate-rs allows you to use open source machine translation in your projects through an easy to use API that connects to the official webpage.
+libretranslate-rs allows you to use open source machine translation in your projects through an easy to use API that connects to the official [webpage](https://libretranslate.com/).
 
+## Example
 Using it is fairly simple:
-
 ```rust
 use libretranslate::{Translator, Language};
 
 fn main() {
-    let input = "Olá Mundo!";
     let source = Language::Portuguese;
     let target = Language::English;
+    let input = "Olá Mundo!";
+    let output = Translator::translate(source, target, input).unwrap().output;
 
-    match Translator::translate(source, target, input) {
-        Ok(data) => println!("{}: {}\n{}: {}", data.source.pretty(), data.input, data.target.pretty(), data.output),
-        Err(error) => panic!("{}", error),
-    };
+    println!("Input {}: {}", source.pretty(), input);
+    println!("Output {}: {}", target.pretty(), output);
 }
 ```
 
 Output:
 ```
-Portuguese: Olá Mundo!
-English: Hello world!
+Input Portuguese: Olá Mundo!
+Output English: Hello world!
 ```
 
-Written with love, in Rust by Grant Handy.
+## Available Languages
+- English
+- Arabic
+- Chinese
+- French
+- German
+- Italian
+- Japanese
+- Portuguese
+- Russian
+- Spanish
+
+Written in Rust, with love by Grant Handy.
