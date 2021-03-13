@@ -77,7 +77,7 @@ impl Language {
         }
     }
 
-    /// Return the language with the full English name. (ex. "Arabic", "German")
+    /// Return the Language with the full English name. (ex. "Arabic", "German")
     pub fn pretty(&self) -> &'static str {
         match self {
             Language::English => "English",
@@ -92,6 +92,11 @@ impl Language {
             Language::Spanish => "Spanish",
         }
     }
+
+	/// Create a Language from &str like "en" or "French". Case Doesn't matter.
+	pub fn from(s: &str) -> Result<Self, LanguageError> {
+		return Self::from_str(s);
+	}
 }
 
 impl FromStr for Language {
