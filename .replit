@@ -1,2 +1,2 @@
 language = "rust"
-run = "cargo run --example basic"
+run = "cargo run --example basic -q"
