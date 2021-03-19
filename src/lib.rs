@@ -1,49 +1,8 @@
-//! # libretranslate-rs
-//! A LibreTranslate API for Rust.
-//! ```
-//! libretranslate = "0.1.2"
-//! ```
-//!
-//! libretranslate-rs allows you to use open source machine translation in your projects through an easy to use API that connects to the official [webpage](https://libretranslate.com/).
-//!
-//! ## Example
-//! Using it is fairly simple:
-//! ```rust
-//! use libretranslate::{Translator, Language};
-//!
-//! fn main() {
-//!     let source = Language::Portuguese;
-//!     let target = Language::English;
-//!     let input = "Olá Mundo!";
-//!     let output = Translator::translate(source, target, input).unwrap().output;
-//!
-//!     println!("Input {}: {}", source.pretty(), input);
-//!     println!("Output {}: {}", target.pretty(), output);
-//! }
-//! ```
-//!
-//! Output:
-//! ```
-//! Input Portuguese: Olá Mundo!
-//! Output English: Hello world!
-//! ```
-//!
-//! ## Available Languages
-//! - English
-//! - Arabic
-//! - Chinese
-//! - French
-//! - German
-//! - Italian
-//! - Japanese
-//! - Portuguese
-//! - Russian
-//! - Spanish
-//!
-//! Written in Rust, with love by Grant Handy.
+
 
 use serde_json::Value;
 use std::str::FromStr;
+use whatlang::Lang;
 
 /// Languages that can used for input and output of the ['translate'] function.
 #[derive(Debug, Clone, PartialEq, Copy)]
@@ -62,7 +21,7 @@ pub enum Language {
 
 impl Language {
     /// Return the language with the language code name. (ex. "ar", "de")
-    pub fn code(&self) -> &'static str {
+    pub fn as_code(&self) -> &'static str {
         match self {
             Language::English => "en",
             Language::Arabic => "ar",
@@ -78,7 +37,7 @@ impl Language {
     }
 
     /// Return the Language with the full English name. (ex. "Arabic", "German")
-    pub fn pretty(&self) -> &'static str {
+    pub fn as_pretty(&self) -> &'static str {
         match self {
             Language::English => "English",
             Language::Arabic => "Arabic",
@@ -169,7 +128,7 @@ impl std::fmt::Display for LanguageError {
 pub enum TranslateError {
     HttpError(String),
     ParseError(String),
-    DetectionError,
+    DetectError,
 }
 
 impl std::error::Error for TranslateError {}
@@ -183,8 +142,8 @@ impl std::fmt::Display for TranslateError {
             TranslateError::ParseError(error) => {
                 write!(f, "JSON Parsing Error: {}", error.to_string())
             }
-            TranslateError::DetectionError => {
-                write!(f, "Error Detecting Language")
+            TranslateError::DetectError => {
+                write!(f, "Language Detection Error")
             }
         }
     }
@@ -197,49 +156,142 @@ pub struct Translator {
     pub output: String,
 }
 
-impl Translator {
-    /// Translate text between two languages.
-    pub fn translate(source: Language, target: Language, input: &str) -> Result<Translator, TranslateError> {
-        match ureq::post("https://libretranslate.com/translate").send_json(ureq::json!({
-            "q": input,
-            "source": source.code(),
-            "target": target.code(),
-        })) {
-            Ok(data) => {
-                let string: String = match data.into_string() {
-                    Ok(data) => data,
-                    Err(error) => {
-                        return Err(TranslateError::ParseError(error.to_string()));
-                    }
-                };
+/// Translate text between two languages.
+pub fn translate(source: Option<Language>, target: Language, input: &str) -> Result<Translator, TranslateError> {
+    let source= match source {
+        Some(data) => data,
+        None => {
+            let info = match whatlang::detect(input) {
+                Some(data) => data,
+                None => return Err(TranslateError::DetectError),
+            };
 
-                let parsed_json: Value = match serde_json::from_str(&string) {
-                    Ok(parsed_json) => parsed_json,
-                    Err(error) => {
-                        return Err(TranslateError::ParseError(error.to_string()));
-                    }
-                };
+            match info.lang() {
+                Lang::Eng => Language::English,
+                Lang::Ara => Language::Arabic,
+                Lang::Fra => Language::French,
+                Lang::Deu => Language::German,
+                Lang::Ita => Language::Italian,
+                Lang::Por => Language::Portuguese,
+                Lang::Rus => Language::Russian,
+                Lang::Spa => Language::Spanish,
+                Lang::Jpn => Language::Japanese,
+                _ => return Err(TranslateError::DetectError),
+            }
+        },
+    };
 
-                let output = match &parsed_json["translatedText"] {
-                    Value::String(output) => output,
-                    _ => {
-                        return Err(TranslateError::ParseError(String::from(
-                            "Unable to find translatedText in parsed JSON",
-                        )))
-                    }
-                };
+    match ureq::post("https://libretranslate.com/translate").send_json(ureq::json!({
+        "q": input,
+        "source": source.as_code(),
+        "target": target.as_code(),
+    })) {
+        Ok(data) => {
+            let string: String = match data.into_string() {
+                Ok(data) => data,
+                Err(error) => {
+                    return Err(TranslateError::ParseError(error.to_string()));
+                }
+            };
 
-                let input = input.to_string();
-                let output = output.to_string();
+            let parsed_json: Value = match serde_json::from_str(&string) {
+                Ok(parsed_json) => parsed_json,
+                Err(error) => {
+                    return Err(TranslateError::ParseError(error.to_string()));
+                }
+            };
 
-                return Ok(Translator {
-                    source,
-                    target,
-                    input,
-                    output,
-                });
-            },
-            Err(error) => return Err(TranslateError::HttpError(error.to_string())),
-        };
+            let output = match &parsed_json["translatedText"] {
+                Value::String(output) => output,
+                _ => {
+                    return Err(TranslateError::ParseError(String::from(
+                        "Unable to find translatedText in parsed JSON",
+                    )))
+                }
+            };
+
+            let input = input.to_string();
+            let output = output.to_string();
+
+            return Ok(Translator {
+                source,
+                target,
+                input,
+                output,
+            });
+        },
+        Err(error) => return Err(TranslateError::HttpError(error.to_string())),
+    };
+}
+
+
+pub trait Translate {
+    fn to_english(&self) -> Result<String, TranslateError>;
+    fn to_arabic(&self) -> Result<String, TranslateError>;
+    fn to_french(&self) -> Result<String, TranslateError>;
+    fn to_german(&self) -> Result<String, TranslateError>;
+    fn to_italian(&self) -> Result<String, TranslateError>;
+    fn to_japanese(&self) -> Result<String, TranslateError>;
+    fn to_portuguese(&self) -> Result<String, TranslateError>;
+    fn to_russian(&self) -> Result<String, TranslateError>;
+    fn to_spanish(&self) -> Result<String, TranslateError>;
+}
+
+impl<T> Translate for T
+    where T: AsRef<str>
+{    
+    fn to_english(&self) -> Result<String, TranslateError> {
+        match translate(None, Language::English, self.as_ref()) {
+            Ok(data) => Ok(data.output),
+            Err(error) => return Err(error),
+        }
+    }
+    fn to_arabic(&self) -> Result<String, TranslateError> {
+        match translate(None, Language::Arabic, self.as_ref()) {
+            Ok(data) => Ok(data.output),
+            Err(error) => return Err(error),
+        }
+    }
+    fn to_french(&self) -> Result<String, TranslateError> {
+        match translate(None, Language::French, self.as_ref()) {
+            Ok(data) => Ok(data.output),
+            Err(error) => return Err(error),
+        }
+    }
+    fn to_german(&self) -> Result<String, TranslateError> {
+        match translate(None, Language::German, self.as_ref()) {
+            Ok(data) => Ok(data.output),
+            Err(error) => return Err(error),
+        }
+    }
+    fn to_italian(&self) -> Result<String, TranslateError> {
+        match translate(None, Language::Italian, self.as_ref()) {
+            Ok(data) => Ok(data.output),
+            Err(error) => return Err(error),
+        }
+    }
+    fn to_japanese(&self) -> Result<String, TranslateError> {
+        match translate(None, Language::Japanese, self.as_ref()) {
+            Ok(data) => Ok(data.output),
+            Err(error) => return Err(error),
+        }
+    }
+    fn to_portuguese(&self) -> Result<String, TranslateError> {
+        match translate(None, Language::Portuguese, self.as_ref()) {
+            Ok(data) => Ok(data.output),
+            Err(error) => return Err(error),
+        }
+    }
+    fn to_russian(&self) -> Result<String, TranslateError> {
+        match translate(None, Language::Russian, self.as_ref()) {
+            Ok(data) => Ok(data.output),
+            Err(error) => return Err(error),
+        }
+    }
+    fn to_spanish(&self) -> Result<String, TranslateError> {
+        match translate(None, Language::Spanish, self.as_ref()) {
+            Ok(data) => Ok(data.output),
+            Err(error) => return Err(error),
+        }
     }
 }

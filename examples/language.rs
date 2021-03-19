@@ -7,6 +7,6 @@ fn main() {
 
 
     assert_eq!(lang, lang_parse);
-    assert_eq!("en", lang.code());
-    assert_eq!("English", lang.pretty())
+    assert_eq!("en", lang.as_code());
+    assert_eq!("English", lang.as_pretty());
 }

@@ -1,11 +1,10 @@
-use libretranslate::{translate, Language};
+use libretranslate::{Language, translate};
 
 fn main() {
-    let source = Language::French;
     let target = Language::English;
-    let input = "le texte français.";
+    let text = "le texte français.";
 
-    let data = translate(Some(source), target, input).unwrap();
+    let data = translate(None, target, text).unwrap();
 
     println!("Input {}: {}", data.source.as_pretty(), data.input);
     println!("Output {}: {}", data.target.as_pretty(), data.output);

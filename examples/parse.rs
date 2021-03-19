@@ -1,10 +1,11 @@
 use libretranslate::Language;
 
-// A demonstration of how to use Language with FromStr to parse str's into Languages.
 fn main() {
-    let chinese = "zh".parse::<Language>().unwrap();
-    let french  = "FRENCH".parse::<Language>().unwrap();
+    let chinese = "zh".parse::<Language>().unwrap().as_pretty();
+    let french  = "FRENCH".parse::<Language>().unwrap().as_code();
+    let english = Language::from("EnGlIsH").unwrap();
 
-    println!("\"zh\" parsed to pretty: {}", chinese.pretty());
-    println!("\"FRENCH\" parsed to code: {}", french.code());
+    println!("\"EnGlIsH\" parsed to code: {}", english);
+    println!("\"zh\" parsed to pretty: {}", chinese);
+    println!("\"FRENCH\" parsed to code: {}", french);
 }
