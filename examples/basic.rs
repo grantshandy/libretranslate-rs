@@ -5,7 +5,7 @@ use libretranslate::{translate, Language};
 fn main() {
     let source = Language::French;
     let target = Language::English;
-    let input = "le texte français.";
+    let input = "Le texte français.";
 
     let data = translate(Some(source), target, input).unwrap();
 

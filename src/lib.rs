@@ -1,7 +1,7 @@
 //! # libretranslate-rs
 //! A LibreTranslate API for Rust.
 //! ```
-//! libretranslate = "0.2.1"
+//! libretranslate = "0.2.2"
 //! ```
 //!
 //! `libretranslate` allows you to use open source machine translation in your projects through an easy to use API that connects to the official [webpage](https://!libretranslate.com/).
@@ -246,6 +246,7 @@ pub enum TranslateError {
     HttpError(String),
     ParseError(String),
     DetectError,
+    Length,
 }
 
 impl std::error::Error for TranslateError {}
@@ -254,13 +255,16 @@ impl std::fmt::Display for TranslateError {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
             TranslateError::HttpError(error) => {
-                write!(f, "HTTP Request Error: {}", error.to_string())
+                write!(f, "HTTP request error: {}", error.to_string())
             }
             TranslateError::ParseError(error) => {
-                write!(f, "JSON Parsing Error: {}", error.to_string())
+                write!(f, "JSON parsing error: {}", error.to_string())
             }
             TranslateError::DetectError => {
-                write!(f, "Language Detection Error")
+                write!(f, "Language detection error")
+            }
+            TranslateError::Length => {
+                write!(f, "Requested text is too long")
             }
         }
     }
@@ -276,6 +280,10 @@ pub struct Translator {
 
 /// Translate text between two languages.
 pub fn translate(source: Option<Language>, target: Language, input: &str) -> Result<Translator, TranslateError> {
+    if input.chars().count() >= 5000 {
+        return Err(TranslateError::Length);
+    };
+
     let source= match source {
         Some(data) => data,
         None => {
