@@ -1,3 +1,5 @@
+// All translations are done through the `translate()` function.
+
 use libretranslate::{translate, Language};
 
 fn main() {

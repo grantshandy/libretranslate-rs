@@ -29,10 +29,12 @@ Input French: le texte français.
 Output English: the French text.
 ```
 
+[See In Examples Folder](https://github.com/DefunctLizard/libretranslate-rs/blob/main/examples/basic.rs)
+
 ## Language Detection
 `libretranslate` uses [`whatlang`](https://crates.io/crates/whatlang) to detect language so you can translate unknown languages into a target language of your choice.
 
-`whatlang` isn't near perfect though, and for short sentences it can be very bad at detecting language. `whatlang` can detect more languages than `libretranslate` can translate, so if it detects your input as a language that `libretranslate` can't translate, the `translate` function will return a `TranslateError::DetectError`.
+`whatlang` isn't perfect though, and for short sentences it can be very bad at detecting language. `whatlang` can detect more languages than `libretranslate` can translate, so if it detects your input as a language that `libretranslate` can't translate, the `translate` function will return a `TranslateError::DetectError`.
 
 Here's a simple example.
 ```rust
@@ -54,6 +56,8 @@ Output:
 Input French: le texte français.
 Output English: the French text.
 ```
+
+[See In Examples Folder](https://github.com/DefunctLizard/libretranslate-rs/blob/main/examples/detect.rs)
 
 ## Language Functionality
 The `Language` enum has a lot of functionality so you can create a `Language` from all sorts of different user inputs.
@@ -84,6 +88,8 @@ Output:
 "FRENCH" parsed to code: fr
 ```
 
+[See In Examples Folder](https://github.com/DefunctLizard/libretranslate-rs/blob/main/examples/parse.rs)
+
 ## String Methods
 The trait `Translate` implements `AsRef<str>`, meaning that any `&str` or `String` can be translated into any other language. These methods use `whatlang`, so be careful that your text is clearly apart of a certain language and not vague/short.
 
@@ -103,6 +109,8 @@ Output:
 detect a language and script by a given text.
 ```
 
+[See In Examples Folder](https://github.com/DefunctLizard/libretranslate-rs/blob/main/examples/method.rs)
+
 ## Available Languages
 - English
 - Arabic
@@ -115,4 +123,4 @@ detect a language and script by a given text.
 - Russian
 - Spanish
 
-Written in Rust, with love by Grant Handy.
+Written in Rust, with love by [Grant Handy](mailto://grantshandy@gmail.com).
