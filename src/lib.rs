@@ -1,7 +1,7 @@
 //! # libretranslate-rs
 //! A LibreTranslate API for Rust.
 //! ```
-//! libretranslate = "0.2.2"
+//! libretranslate = "0.2.3"
 //! ```
 //!
 //! `libretranslate` allows you to use open source machine translation in your projects through an easy to use API that connects to the official [webpage](https://!libretranslate.com/).
@@ -89,11 +89,11 @@
 //!
 //! Here's a simple example.
 //! ```rust
-//! use libretranslate::Translate;
+//! use libretranslate::{Translate, Language};
 //!
 //! fn main() {
-//!     let text = "Détecter une langue et un script par un texte donné.".to_english().unwrap();
-//!
+//!     let text = "Détecter une langue et un script par un texte donné.".to_english_from(Language::French).unwrap();
+//!    
 //!     println!("{}", text);
 //! }
 //! ```
@@ -122,7 +122,7 @@ use std::str::FromStr;
 use whatlang::Lang;
 
 /// Languages that can used for input and output of the [`translate`] function.
-#[derive(Debug, Clone, PartialEq, Copy)]
+#[derive(Debug, Clone, PartialEq, Copy, Hash)]
 pub enum Language {
     English,
     Arabic,
@@ -223,7 +223,7 @@ impl std::fmt::Display for Language {
 }
 
 /// Errors that could be outputed by a Language.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Hash)]
 pub enum LanguageError {
     FormatError(String),
 }
@@ -241,12 +241,12 @@ impl std::fmt::Display for LanguageError {
 }
 
 /// Errors that could be outputed by the translator.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Hash)]
 pub enum TranslateError {
     HttpError(String),
     ParseError(String),
     DetectError,
-    Length,
+    LengthError,
 }
 
 impl std::error::Error for TranslateError {}
@@ -263,7 +263,7 @@ impl std::fmt::Display for TranslateError {
             TranslateError::DetectError => {
                 write!(f, "Language detection error")
             }
-            TranslateError::Length => {
+            TranslateError::LengthError => {
                 write!(f, "Requested text is too long")
             }
         }
@@ -271,7 +271,8 @@ impl std::fmt::Display for TranslateError {
 }
 
 /// Data that is output by the [`translate`] function.
-pub struct Translator {
+#[derive(Debug, Clone, PartialEq, Hash)]
+pub struct Translation {
     pub source: Language,
     pub target: Language,
     pub input: String,
@@ -279,9 +280,9 @@ pub struct Translator {
 }
 
 /// Translate text between two languages.
-pub fn translate(source: Option<Language>, target: Language, input: &str) -> Result<Translator, TranslateError> {
+pub fn translate(source: Option<Language>, target: Language, input: &str) -> Result<Translation, TranslateError> {
     if input.chars().count() >= 5000 {
-        return Err(TranslateError::Length);
+        return Err(TranslateError::LengthError);
     };
 
     let source= match source {
@@ -339,7 +340,7 @@ pub fn translate(source: Option<Language>, target: Language, input: &str) -> Res
             let input = input.to_string();
             let output = output.to_string();
 
-            return Ok(Translator {
+            return Ok(Translation {
                 source,
                 target,
                 input,
@@ -352,6 +353,15 @@ pub fn translate(source: Option<Language>, target: Language, input: &str) -> Res
 
 /// A trait that lets you convert [`AsRef<str>`] into translated text.
 pub trait Translate {
+    fn to_english_from(&self, language: Language) -> Result<String, TranslateError>;
+    fn to_arabic_from(&self, language: Language) -> Result<String, TranslateError>;
+    fn to_french_from(&self, language: Language) -> Result<String, TranslateError>;
+    fn to_german_from(&self, language: Language) -> Result<String, TranslateError>;
+    fn to_italian_from(&self, language: Language) -> Result<String, TranslateError>;
+    fn to_japanese_from(&self, language: Language) -> Result<String, TranslateError>;
+    fn to_portuguese_from(&self, language: Language) -> Result<String, TranslateError>;
+    fn to_russian_from(&self, language: Language) -> Result<String, TranslateError>;
+    fn to_spanish_from(&self, language: Language) -> Result<String, TranslateError>;
     fn to_english(&self) -> Result<String, TranslateError>;
     fn to_arabic(&self) -> Result<String, TranslateError>;
     fn to_french(&self) -> Result<String, TranslateError>;
@@ -366,6 +376,60 @@ pub trait Translate {
 impl<T> Translate for T
     where T: AsRef<str>
 {    
+    fn to_english_from(&self, language: Language) -> Result<String, TranslateError> {
+        match translate(Some(language), Language::English, self.as_ref()) {
+            Ok(data) => Ok(data.output),
+            Err(error) => return Err(error),
+        }
+    }
+    fn to_arabic_from(&self, language: Language) -> Result<String, TranslateError> {
+        match translate(Some(language), Language::Arabic, self.as_ref()) {
+            Ok(data) => Ok(data.output),
+            Err(error) => return Err(error),
+        }
+    }
+    fn to_french_from(&self, language: Language) -> Result<String, TranslateError> {
+        match translate(Some(language), Language::French, self.as_ref()) {
+            Ok(data) => Ok(data.output),
+            Err(error) => return Err(error),
+        }
+    }
+    fn to_german_from(&self, language: Language) -> Result<String, TranslateError> {
+        match translate(Some(language), Language::German, self.as_ref()) {
+            Ok(data) => Ok(data.output),
+            Err(error) => return Err(error),
+        }
+    }
+    fn to_italian_from(&self, language: Language) -> Result<String, TranslateError> {
+        match translate(Some(language), Language::Italian, self.as_ref()) {
+            Ok(data) => Ok(data.output),
+            Err(error) => return Err(error),
+        }
+    }
+    fn to_japanese_from(&self, language: Language) -> Result<String, TranslateError> {
+        match translate(Some(language), Language::Japanese, self.as_ref()) {
+            Ok(data) => Ok(data.output),
+            Err(error) => return Err(error),
+        }
+    }
+    fn to_portuguese_from(&self, language: Language) -> Result<String, TranslateError> {
+        match translate(Some(language), Language::Portuguese, self.as_ref()) {
+            Ok(data) => Ok(data.output),
+            Err(error) => return Err(error),
+        }
+    }
+    fn to_russian_from(&self, language: Language) -> Result<String, TranslateError> {
+        match translate(Some(language), Language::Russian, self.as_ref()) {
+            Ok(data) => Ok(data.output),
+            Err(error) => return Err(error),
+        }
+    }
+    fn to_spanish_from(&self, language: Language) -> Result<String, TranslateError> {
+        match translate(Some(language), Language::Spanish, self.as_ref()) {
+            Ok(data) => Ok(data.output),
+            Err(error) => return Err(error),
+        }
+    }
     fn to_english(&self) -> Result<String, TranslateError> {
         match translate(None, Language::English, self.as_ref()) {
             Ok(data) => Ok(data.output),
