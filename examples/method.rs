@@ -3,7 +3,10 @@
 use libretranslate::{Translate, Language};
 
 fn main() {
-    let text = "This is text, written on a computer, in English.".to_german_from(Language::English).unwrap();
+    let text = "This is text, written on a computer, in English."
+        .from_lang(Language::German)
+        .to_lang(Language::English)
+        .translate().unwrap();
     
     println!("{}", text);
 }
