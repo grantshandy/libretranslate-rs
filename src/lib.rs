@@ -130,7 +130,7 @@ use whatlang::Lang;
 
 pub use error::{LanguageError, TranslateError};
 pub use languages::Language;
-pub use traits::{Query, Translate};
+pub use traits::Translate;
 
 /// Data that is output by the [`translate`] function.
 #[derive(Debug, Clone, PartialEq, Hash)]
@@ -178,7 +178,7 @@ pub async fn translate<T: AsRef<str>>(
         Ok(data) => data,
         Err(error) => return Err(TranslateError::HttpError(error.to_string())),
     };
-
+    
     let parsed_json: Value = match serde_json::from_str(&data) {
         Ok(parsed_json) => parsed_json,
         Err(error) => {

@@ -3,11 +3,12 @@
 
 use libretranslate::{translate, Language};
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let target = Language::English;
     let text = "le texte français.";
 
-    let data = translate(None, target, text).unwrap();
+    let data = translate(None, target, text).await.unwrap();
 
     println!("Input {}: {}", data.source.as_pretty(), data.input);
     println!("Output {}: {}", data.target.as_pretty(), data.output);

@@ -1,8 +1,8 @@
 // The trait `Translate` implements `AsRef<str>`, meaning that any `&str` or `String` can be translated into any other language.
 
-use libretranslate::{Language, Translate, TranslateError};
+use libretranslate::{Language, Translate};
 
-#[async_std::main]
+#[tokio::main]
 async fn main() {
     let text = "This is text, written on a computer, in English."
         .to_lang(Language::German)
