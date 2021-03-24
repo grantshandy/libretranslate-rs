@@ -1,5 +1,5 @@
 # libretranslate-rs
-A LibreTranslate API for Rust.
+A LibreTranslate API client for Rust.
 ```
 libretranslate = "0.2.5"
 ```
