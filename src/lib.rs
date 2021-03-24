@@ -215,9 +215,9 @@ pub fn translate<T: AsRef<str>>(
 }
 
 pub struct Query<'a> {
-    text: &'a str,
-    source: Option<Language>,
-    target: Language,
+    pub text: &'a str,
+    pub source: Option<Language>,
+    pub target: Language,
 }
 
 impl<'a> Query<'a> {

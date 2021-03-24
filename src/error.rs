@@ -10,7 +10,7 @@ impl std::fmt::Display for LanguageError {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
             LanguageError::FormatError(error) => {
-                write!(f, "Unknown Language: {}", error.to_string())
+                write!(f, "Unknown Language: {}", error)
             }
         }
     }

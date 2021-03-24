@@ -4,10 +4,11 @@ use libretranslate::{Language, Translate};
 
 fn main() {
     let text = "This is text, written on a computer, in English."
-        .from_lang(Language::English)
-        .to_lang(Language::French)
-        .translate()
-        .unwrap();
+        .to_lang(Language::German)
+        .from_lang(Language::English);
 
-    println!("{}", text);
+    println!("text: \"{}\"", text.text);
+    println!("source: {}", text.source.unwrap());
+    println!("target: {}", text.target);
+    println!("output: \"{}\"", text.translate().unwrap());
 }
