@@ -1,7 +1,7 @@
 //! # libretranslate-rs
 //! A LibreTranslate API for Rust.
 //! ```
-//! libretranslate = "0.2.4"
+//! libretranslate = "0.2.5"
 //! ```
 //!
 //! `libretranslate` allows you to use open source machine translation in your projects through an easy to use API that connects to the official [webpage](https://!libretranslate.com/).
@@ -89,11 +89,15 @@
 //!
 //! Here's a simple example.
 //! ```rust
-//! use libretranslate::{Translate, Language};
+//! use libretranslate::{Language, Translate};
 //!
 //! fn main() {
-//!     let text = "Détecter une langue et un script par un texte donné.".to_english_from(Language::French).unwrap();
-//!    
+//!     let text = "This is text, written on a computer, in English."
+//!         .from_lang(Language::English)
+//!         .to_lang(Language::French)
+//!         .translate()
+//!         .unwrap();
+//!
 //!     println!("{}", text);
 //! }
 //! ```
@@ -170,8 +174,8 @@ impl Language {
     }
 
     /// Create a Language from &str like "en" or "French". Case Doesn't matter.
-    pub fn from(s: &str) -> Result<Self, LanguageError> {
-        return Self::from_str(s);
+    pub fn from<T: AsRef<str>>(s: T) -> Result<Self, LanguageError> {
+        return Self::from_str(s.as_ref());
     }
 }
 
@@ -286,19 +290,19 @@ pub struct Translation {
 }
 
 /// Translate text between two languages.
-pub fn translate(
+pub fn translate<T: AsRef<str>>(
     source: Option<Language>,
     target: Language,
-    input: &str,
+    input: T,
 ) -> Result<Translation, TranslateError> {
-    if input.chars().count() >= 5000 {
+    if input.as_ref().chars().count() >= 5000 {
         return Err(TranslateError::LengthError);
     };
 
     let source = match source {
         Some(data) => data,
         None => {
-            let info = match whatlang::detect(input) {
+            let info = match whatlang::detect(input.as_ref()) {
                 Some(data) => data,
                 None => return Err(TranslateError::DetectError),
             };
@@ -319,7 +323,7 @@ pub fn translate(
     };
 
     match ureq::post("https://libretranslate.com/translate").send_json(ureq::json!({
-        "q": input,
+        "q": input.as_ref(),
         "source": source.as_code(),
         "target": target.as_code(),
     })) {
@@ -347,7 +351,7 @@ pub fn translate(
                 }
             };
 
-            let input = input.to_string();
+            let input = input.as_ref().to_string();
             let output = output.to_string();
 
             return Ok(Translation {
@@ -363,23 +367,23 @@ pub fn translate(
 
 pub struct Query<'a> {
     text: &'a str,
-    src: Language,
-    dst: Language,
+    source: Option<Language>,
+    target: Language,
 }
 
 impl<'a> Query<'a> {
     pub fn to_lang(mut self, language: Language) -> Query<'a> {
-        self.dst = language;
+        self.target = language;
         self
     }
 
     pub fn from_lang(mut self, language: Language) -> Query<'a> {
-        self.src = language;
+        self.source = Some(language);
         self
     }
 
     pub fn translate(self) -> Result<String, TranslateError> {
-        let res = translate(Some(self.dst), self.src, &self.text)?;
+        let res = translate(self.source, self.target, self.text)?;
         Ok(res.output)
     }
 }
@@ -396,16 +400,16 @@ where
     fn to_lang(&self, language: Language) -> Query {
         Query {
             text: self.as_ref(),
-            src: Language::default(),
-            dst: language,
+            source: None,
+            target: language,
         }
     }
 
     fn from_lang(&self, language: Language) -> Query {
         Query {
             text: self.as_ref(),
-            src: language,
-            dst: Language::default(),
+            source: Some(language),
+            target: Language::default(),
         }
     }
 }

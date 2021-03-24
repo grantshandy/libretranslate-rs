@@ -4,8 +4,8 @@ use libretranslate::{Language, Translate};
 
 fn main() {
     let text = "This is text, written on a computer, in English."
-        .from_lang(Language::German)
-        .to_lang(Language::English)
+        .from_lang(Language::English)
+        .to_lang(Language::French)
         .translate()
         .unwrap();
 

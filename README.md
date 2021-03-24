@@ -1,7 +1,7 @@
 # libretranslate-rs
 A LibreTranslate API for Rust.
 ```
-libretranslate = "0.2.4"
+libretranslate = "0.2.5"
 ```
 
 `libretranslate` allows you to use open source machine translation in your projects through an easy to use API that connects to the official [webpage](https://libretranslate.com/).
@@ -95,18 +95,22 @@ The trait `Translate` implements `AsRef<str>`, meaning that any `&str` or `Strin
 
 Here's a simple example.
 ```rust
-use libretranslate::{Translate, Language};
+use libretranslate::{Language, Translate};
 
 fn main() {
-    let text = "Détecter une langue et un script par un texte donné.".to_english_from(Language::French).unwrap();
-    
+    let text = "This is text, written on a computer, in English."
+        .from_lang(Language::English)
+        .to_lang(Language::French)
+        .translate()
+        .unwrap();
+
     println!("{}", text);
 }
 ```
 
 Output:
 ```
-detect a language and script by a given text.
+C'est un texte, écrit sur un ordinateur, en anglais.
 ```
 
 [See In Examples Folder](https://github.com/DefunctLizard/libretranslate-rs/blob/main/examples/method.rs)
