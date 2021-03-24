@@ -1,8 +1,9 @@
 // The trait `Translate` implements `AsRef<str>`, meaning that any `&str` or `String` can be translated into any other language.
 
-use libretranslate::{Language, Translate};
+use libretranslate::{Language, Translate, TranslateError};
 
-fn main() {
+#[async_std::main]
+async fn main() {
     let text = "This is text, written on a computer, in English."
         .to_lang(Language::German)
         .from_lang(Language::English);
@@ -10,5 +11,5 @@ fn main() {
     println!("text: \"{}\"", text.text);
     println!("source: {}", text.source.unwrap());
     println!("target: {}", text.target);
-    println!("output: \"{}\"", text.translate().unwrap());
+    println!("output: \"{}\"", text.translate().await.unwrap());
 }
