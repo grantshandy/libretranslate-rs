@@ -7,6 +7,8 @@ libretranslate = "0.2.5"
 `libretranslate` allows you to use open source machine translation in your projects through an easy to use API that connects to the official [webpage](https://libretranslate.com/).
 
 ## Basic Example
+`libretranslate` is an async library, so you'll have to use an async runtime like [`tokio`](https://crates.io/crates/tokio) or [`async-std`](https://crates.io/crates/async-std)
+
 All translations are done through the `translate()` function:
 ```rust
 use libretranslate::{translate, Language};
@@ -38,13 +40,14 @@ Output English: the French text.
 
 Here's a simple example.
 ```rust
-use libretranslate::{Language, translate};
+use libretranslate::{translate, Language};
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let target = Language::English;
     let text = "le texte français.";
 
-    let data = translate(None, target, text).unwrap();
+    let data = translate(None, target, text).await.unwrap();
 
     println!("Input {}: {}", data.source.as_pretty(), data.input);
     println!("Output {}: {}", data.target.as_pretty(), data.output);
@@ -71,21 +74,13 @@ Here's a simple example.
 use libretranslate::Language;
 
 fn main() {
-    let english = Language::from("EnGlIsH").unwrap();
-    let chinese = "zh".parse::<Language>().unwrap().as_pretty();
-    let french  = "FRENCH".parse::<Language>().unwrap().as_code();
+    let lang = Language::English;
+    let lang_parse = "english".parse::<Language>().unwrap();
 
-    println!("\"EnGlIsH\" parsed to code: {}", english);
-    println!("\"zh\" parsed to pretty: {}", chinese);
-    println!("\"FRENCH\" parsed to code: {}", french);
+    assert_eq!(lang, lang_parse);
+    assert_eq!("en", lang.as_code());
+    assert_eq!("English", lang.as_pretty());
 }
-```
-
-Output:
-```
-"EnGlIsH" parsed to code: en
-"zh" parsed to pretty: Chinese
-"FRENCH" parsed to code: fr
 ```
 
 [See In Examples Folder](https://github.com/DefunctLizard/libretranslate-rs/blob/main/examples/parse.rs)
@@ -97,20 +92,23 @@ Here's a simple example.
 ```rust
 use libretranslate::{Language, Translate};
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let text = "This is text, written on a computer, in English."
+        .to_lang(Language::German)
         .from_lang(Language::English)
-        .to_lang(Language::French)
         .translate()
+        .await
         .unwrap();
 
-    println!("{}", text);
+    println!("output: \"{}\"", text);
 }
+
 ```
 
 Output:
 ```
-C'est un texte, écrit sur un ordinateur, en anglais.
+output: "Dies ist Text, geschrieben auf einem Computer, in Englisch."
 ```
 
 [See In Examples Folder](https://github.com/DefunctLizard/libretranslate-rs/blob/main/examples/method.rs)

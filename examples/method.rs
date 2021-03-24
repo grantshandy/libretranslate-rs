@@ -6,10 +6,10 @@ use libretranslate::{Language, Translate};
 async fn main() {
     let text = "This is text, written on a computer, in English."
         .to_lang(Language::German)
-        .from_lang(Language::English);
+        .from_lang(Language::English)
+        .translate()
+        .await
+        .unwrap();
 
-    println!("text: \"{}\"", text.text);
-    println!("source: {}", text.source.unwrap());
-    println!("target: {}", text.target);
-    println!("output: \"{}\"", text.translate().await.unwrap());
+    println!("output: \"{}\"", text);
 }
