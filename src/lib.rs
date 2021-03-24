@@ -127,6 +127,7 @@ pub mod traits;
 
 use serde_json::Value;
 use whatlang::Lang;
+
 pub use error::{LanguageError, TranslateError};
 pub use languages::Language;
 pub use traits::{Query, Translate};
@@ -141,7 +142,7 @@ pub struct Translation {
 }
 
 /// Translate text between two languages.
-pub fn translate<T: AsRef<str>>(
+pub async fn translate<T: AsRef<str>>(
     source: Option<Language>,
     target: Language,
     input: T,
@@ -173,45 +174,50 @@ pub fn translate<T: AsRef<str>>(
         }
     };
 
-    match ureq::post("https://libretranslate.com/translate").send_json(ureq::json!({
-        "q": input.as_ref(),
-        "source": source.as_code(),
-        "target": target.as_code(),
-    })) {
-        Ok(data) => {
-            let string: String = match data.into_string() {
-                Ok(data) => data,
-                Err(error) => {
-                    return Err(TranslateError::ParseError(error.to_string()));
-                }
-            };
-
-            let parsed_json: Value = match serde_json::from_str(&string) {
-                Ok(parsed_json) => parsed_json,
-                Err(error) => {
-                    return Err(TranslateError::ParseError(error.to_string()));
-                }
-            };
-
-            let output = match &parsed_json["translatedText"] {
-                Value::String(output) => output,
-                _ => {
-                    return Err(TranslateError::ParseError(String::from(
-                        "Unable to find translatedText in parsed JSON",
-                    )))
-                }
-            };
-
-            let input = input.as_ref().to_string();
-            let output = output.to_string();
-
-            return Ok(Translation {
-                source,
-                target,
-                input,
-                output,
-            });
-        }
+    let data = match get_raw_data(source, target, input.as_ref()).await {
+        Ok(data) => data,
         Err(error) => return Err(TranslateError::HttpError(error.to_string())),
     };
+  
+    let parsed_json: Value = match serde_json::from_str(&data) {
+        Ok(parsed_json) => parsed_json,
+        Err(error) => {
+            return Err(TranslateError::ParseError(error.to_string()));
+        }
+    };
+
+    let output = match &parsed_json["translatedText"] {
+        Value::String(output) => output,
+        _ => {
+            return Err(TranslateError::ParseError(String::from(
+                "Unable to find translatedText in parsed JSON",
+            )))
+        }
+    };
+
+    let input = input.as_ref().to_string();
+    let output = output.to_string();
+
+    return Ok(Translation {
+        source,
+        target,
+        input,
+        output,
+    });
+}
+
+async fn get_raw_data(source: Language, target: Language, input: &str) -> Result<String, surf::http::Error> {
+    let uri = "https://libretranslate.com/translate";
+
+    let data = serde_json::json!({
+        "q": input,
+        "source": source.as_code(),
+        "target": target.as_code(),
+    });
+
+    let res = surf::post(uri)
+        .body(surf::http::Body::from_json(&data)?)
+        .recv_string().await?;
+
+    Ok(res)
 }

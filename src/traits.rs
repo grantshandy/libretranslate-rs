@@ -1,4 +1,4 @@
-use crate::{translate, Language, TranslateError};
+use crate::{TranslateError, Language, translate};
 
 pub struct Query<'a> {
     pub text: &'a str,
@@ -17,8 +17,8 @@ impl<'a> Query<'a> {
         self
     }
 
-    pub fn translate(self) -> Result<String, TranslateError> {
-        let res = translate(self.source, self.target, self.text)?;
+    pub async fn translate(self) -> Result<String, TranslateError> {
+        let res = translate(self.source, self.target, self.text).await?;
         Ok(res.output)
     }
 }

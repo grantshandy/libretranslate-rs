@@ -2,7 +2,8 @@
 
 use libretranslate::{Language, Translate};
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let text = "This is text, written on a computer, in English."
         .to_lang(Language::German)
         .from_lang(Language::English);
@@ -10,5 +11,5 @@ fn main() {
     println!("text: \"{}\"", text.text);
     println!("source: {}", text.source.unwrap());
     println!("target: {}", text.target);
-    println!("output: \"{}\"", text.translate().unwrap());
+    println!("output: \"{}\"", text.translate().await.unwrap());
 }
