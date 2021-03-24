@@ -175,6 +175,14 @@ impl Language {
 	}
 }
 
+impl Default for Language
+{
+    fn default() -> Self
+    {
+        Language::English
+    }
+}
+
 impl FromStr for Language {
     type Err = LanguageError;
 
@@ -351,137 +359,60 @@ pub fn translate(source: Option<Language>, target: Language, input: &str) -> Res
     };
 }
 
-/// A trait that lets you convert [`AsRef<str>`] into translated text.
-pub trait Translate {
-    fn to_english_from(&self, language: Language) -> Result<String, TranslateError>;
-    fn to_arabic_from(&self, language: Language) -> Result<String, TranslateError>;
-    fn to_french_from(&self, language: Language) -> Result<String, TranslateError>;
-    fn to_german_from(&self, language: Language) -> Result<String, TranslateError>;
-    fn to_italian_from(&self, language: Language) -> Result<String, TranslateError>;
-    fn to_japanese_from(&self, language: Language) -> Result<String, TranslateError>;
-    fn to_portuguese_from(&self, language: Language) -> Result<String, TranslateError>;
-    fn to_russian_from(&self, language: Language) -> Result<String, TranslateError>;
-    fn to_spanish_from(&self, language: Language) -> Result<String, TranslateError>;
-    fn to_english(&self) -> Result<String, TranslateError>;
-    fn to_arabic(&self) -> Result<String, TranslateError>;
-    fn to_french(&self) -> Result<String, TranslateError>;
-    fn to_german(&self) -> Result<String, TranslateError>;
-    fn to_italian(&self) -> Result<String, TranslateError>;
-    fn to_japanese(&self) -> Result<String, TranslateError>;
-    fn to_portuguese(&self) -> Result<String, TranslateError>;
-    fn to_russian(&self) -> Result<String, TranslateError>;
-    fn to_spanish(&self) -> Result<String, TranslateError>;
+pub struct Query<'a>
+{
+    text: &'a str,
+    src:  Language,
+    dst:  Language,
 }
+
+impl<'a> Query<'a>
+{
+    pub fn to_lang(mut self, language: Language) -> Query<'a>
+    {
+        self.dst = language;
+        self
+    }
+
+    pub fn from_lang(mut self, language: Language) -> Query<'a>
+    {
+        self.src = language;
+        self
+    }
+
+    pub fn translate(self) -> Result<String, TranslateError>
+    {
+        let res = translate(Some(self.dst), self.src, &self.text)?;
+        Ok(res.output)
+    }
+}
+
+pub trait Translate
+{
+    fn to_lang(&self,   language: Language) -> Query;
+    fn from_lang(&self, language: Language) -> Query;
+}
+
 
 impl<T> Translate for T
     where T: AsRef<str>
-{    
-    fn to_english_from(&self, language: Language) -> Result<String, TranslateError> {
-        match translate(Some(language), Language::English, self.as_ref()) {
-            Ok(data) => Ok(data.output),
-            Err(error) => return Err(error),
+{
+    fn to_lang(&self, language: Language) -> Query
+    {
+        Query {
+            text: self.as_ref(),
+            src: Language::default(),
+            dst: language,
         }
     }
-    fn to_arabic_from(&self, language: Language) -> Result<String, TranslateError> {
-        match translate(Some(language), Language::Arabic, self.as_ref()) {
-            Ok(data) => Ok(data.output),
-            Err(error) => return Err(error),
-        }
-    }
-    fn to_french_from(&self, language: Language) -> Result<String, TranslateError> {
-        match translate(Some(language), Language::French, self.as_ref()) {
-            Ok(data) => Ok(data.output),
-            Err(error) => return Err(error),
-        }
-    }
-    fn to_german_from(&self, language: Language) -> Result<String, TranslateError> {
-        match translate(Some(language), Language::German, self.as_ref()) {
-            Ok(data) => Ok(data.output),
-            Err(error) => return Err(error),
-        }
-    }
-    fn to_italian_from(&self, language: Language) -> Result<String, TranslateError> {
-        match translate(Some(language), Language::Italian, self.as_ref()) {
-            Ok(data) => Ok(data.output),
-            Err(error) => return Err(error),
-        }
-    }
-    fn to_japanese_from(&self, language: Language) -> Result<String, TranslateError> {
-        match translate(Some(language), Language::Japanese, self.as_ref()) {
-            Ok(data) => Ok(data.output),
-            Err(error) => return Err(error),
-        }
-    }
-    fn to_portuguese_from(&self, language: Language) -> Result<String, TranslateError> {
-        match translate(Some(language), Language::Portuguese, self.as_ref()) {
-            Ok(data) => Ok(data.output),
-            Err(error) => return Err(error),
-        }
-    }
-    fn to_russian_from(&self, language: Language) -> Result<String, TranslateError> {
-        match translate(Some(language), Language::Russian, self.as_ref()) {
-            Ok(data) => Ok(data.output),
-            Err(error) => return Err(error),
-        }
-    }
-    fn to_spanish_from(&self, language: Language) -> Result<String, TranslateError> {
-        match translate(Some(language), Language::Spanish, self.as_ref()) {
-            Ok(data) => Ok(data.output),
-            Err(error) => return Err(error),
-        }
-    }
-    fn to_english(&self) -> Result<String, TranslateError> {
-        match translate(None, Language::English, self.as_ref()) {
-            Ok(data) => Ok(data.output),
-            Err(error) => return Err(error),
-        }
-    }
-    fn to_arabic(&self) -> Result<String, TranslateError> {
-        match translate(None, Language::Arabic, self.as_ref()) {
-            Ok(data) => Ok(data.output),
-            Err(error) => return Err(error),
-        }
-    }
-    fn to_french(&self) -> Result<String, TranslateError> {
-        match translate(None, Language::French, self.as_ref()) {
-            Ok(data) => Ok(data.output),
-            Err(error) => return Err(error),
-        }
-    }
-    fn to_german(&self) -> Result<String, TranslateError> {
-        match translate(None, Language::German, self.as_ref()) {
-            Ok(data) => Ok(data.output),
-            Err(error) => return Err(error),
-        }
-    }
-    fn to_italian(&self) -> Result<String, TranslateError> {
-        match translate(None, Language::Italian, self.as_ref()) {
-            Ok(data) => Ok(data.output),
-            Err(error) => return Err(error),
-        }
-    }
-    fn to_japanese(&self) -> Result<String, TranslateError> {
-        match translate(None, Language::Japanese, self.as_ref()) {
-            Ok(data) => Ok(data.output),
-            Err(error) => return Err(error),
-        }
-    }
-    fn to_portuguese(&self) -> Result<String, TranslateError> {
-        match translate(None, Language::Portuguese, self.as_ref()) {
-            Ok(data) => Ok(data.output),
-            Err(error) => return Err(error),
-        }
-    }
-    fn to_russian(&self) -> Result<String, TranslateError> {
-        match translate(None, Language::Russian, self.as_ref()) {
-            Ok(data) => Ok(data.output),
-            Err(error) => return Err(error),
-        }
-    }
-    fn to_spanish(&self) -> Result<String, TranslateError> {
-        match translate(None, Language::Spanish, self.as_ref()) {
-            Ok(data) => Ok(data.output),
-            Err(error) => return Err(error),
+
+    fn from_lang(&self, language: Language) -> Query
+    {
+        Query {
+            text: self.as_ref(),
+            src: language,
+            dst: Language::default(),
         }
     }
 }
+
