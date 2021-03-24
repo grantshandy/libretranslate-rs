@@ -179,6 +179,7 @@ impl Language {
     }
 }
 
+// TODO: Get locale from user to set Language::default().
 impl Default for Language {
     fn default() -> Self {
         Language::English
