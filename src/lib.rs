@@ -123,11 +123,13 @@
 
 pub mod error;
 pub mod languages;
+pub mod traits;
 
 use serde_json::Value;
 use whatlang::Lang;
 pub use error::{LanguageError, TranslateError};
 pub use languages::Language;
+pub use traits::{Query, Translate};
 
 /// Data that is output by the [`translate`] function.
 #[derive(Debug, Clone, PartialEq, Hash)]
@@ -212,53 +214,4 @@ pub fn translate<T: AsRef<str>>(
         }
         Err(error) => return Err(TranslateError::HttpError(error.to_string())),
     };
-}
-
-pub struct Query<'a> {
-    pub text: &'a str,
-    pub source: Option<Language>,
-    pub target: Language,
-}
-
-impl<'a> Query<'a> {
-    pub fn to_lang(mut self, language: Language) -> Query<'a> {
-        self.target = language;
-        self
-    }
-
-    pub fn from_lang(mut self, language: Language) -> Query<'a> {
-        self.source = Some(language);
-        self
-    }
-
-    pub fn translate(self) -> Result<String, TranslateError> {
-        let res = translate(self.source, self.target, self.text)?;
-        Ok(res.output)
-    }
-}
-
-pub trait Translate {
-    fn to_lang(&self, language: Language) -> Query;
-    fn from_lang(&self, language: Language) -> Query;
-}
-
-impl<T> Translate for T
-where
-    T: AsRef<str>,
-{
-    fn to_lang(&self, language: Language) -> Query {
-        Query {
-            text: self.as_ref(),
-            source: None,
-            target: language,
-        }
-    }
-
-    fn from_lang(&self, language: Language) -> Query {
-        Query {
-            text: self.as_ref(),
-            source: Some(language),
-            target: Language::default(),
-        }
-    }
 }
