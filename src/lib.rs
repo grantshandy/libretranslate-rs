@@ -169,16 +169,14 @@ impl Language {
         }
     }
 
-	/// Create a Language from &str like "en" or "French". Case Doesn't matter.
-	pub fn from(s: &str) -> Result<Self, LanguageError> {
-		return Self::from_str(s);
-	}
+    /// Create a Language from &str like "en" or "French". Case Doesn't matter.
+    pub fn from(s: &str) -> Result<Self, LanguageError> {
+        return Self::from_str(s);
+    }
 }
 
-impl Default for Language
-{
-    fn default() -> Self
-    {
+impl Default for Language {
+    fn default() -> Self {
         Language::English
     }
 }
@@ -201,7 +199,7 @@ impl FromStr for Language {
             "english" => Ok(Language::English),
             "arabic" => Ok(Language::Arabic),
             "chinese" => Ok(Language::Chinese),
-            "french"=> Ok(Language::French),
+            "french" => Ok(Language::French),
             "german" => Ok(Language::German),
             "italian" => Ok(Language::Italian),
             "portuguese" => Ok(Language::Portuguese),
@@ -209,7 +207,7 @@ impl FromStr for Language {
             "spanish" => Ok(Language::Spanish),
             "japanese" => Ok(Language::Japanese),
             &_ => Err(LanguageError::FormatError(s.to_string())),
-        }    
+        }
     }
 }
 
@@ -288,12 +286,16 @@ pub struct Translation {
 }
 
 /// Translate text between two languages.
-pub fn translate(source: Option<Language>, target: Language, input: &str) -> Result<Translation, TranslateError> {
+pub fn translate(
+    source: Option<Language>,
+    target: Language,
+    input: &str,
+) -> Result<Translation, TranslateError> {
     if input.chars().count() >= 5000 {
         return Err(TranslateError::LengthError);
     };
 
-    let source= match source {
+    let source = match source {
         Some(data) => data,
         None => {
             let info = match whatlang::detect(input) {
@@ -313,7 +315,7 @@ pub fn translate(source: Option<Language>, target: Language, input: &str) -> Res
                 Lang::Jpn => Language::Japanese,
                 _ => return Err(TranslateError::DetectError),
             }
-        },
+        }
     };
 
     match ureq::post("https://libretranslate.com/translate").send_json(ureq::json!({
@@ -354,51 +356,44 @@ pub fn translate(source: Option<Language>, target: Language, input: &str) -> Res
                 input,
                 output,
             });
-        },
+        }
         Err(error) => return Err(TranslateError::HttpError(error.to_string())),
     };
 }
 
-pub struct Query<'a>
-{
+pub struct Query<'a> {
     text: &'a str,
-    src:  Language,
-    dst:  Language,
+    src: Language,
+    dst: Language,
 }
 
-impl<'a> Query<'a>
-{
-    pub fn to_lang(mut self, language: Language) -> Query<'a>
-    {
+impl<'a> Query<'a> {
+    pub fn to_lang(mut self, language: Language) -> Query<'a> {
         self.dst = language;
         self
     }
 
-    pub fn from_lang(mut self, language: Language) -> Query<'a>
-    {
+    pub fn from_lang(mut self, language: Language) -> Query<'a> {
         self.src = language;
         self
     }
 
-    pub fn translate(self) -> Result<String, TranslateError>
-    {
+    pub fn translate(self) -> Result<String, TranslateError> {
         let res = translate(Some(self.dst), self.src, &self.text)?;
         Ok(res.output)
     }
 }
 
-pub trait Translate
-{
-    fn to_lang(&self,   language: Language) -> Query;
+pub trait Translate {
+    fn to_lang(&self, language: Language) -> Query;
     fn from_lang(&self, language: Language) -> Query;
 }
 
-
 impl<T> Translate for T
-    where T: AsRef<str>
+where
+    T: AsRef<str>,
 {
-    fn to_lang(&self, language: Language) -> Query
-    {
+    fn to_lang(&self, language: Language) -> Query {
         Query {
             text: self.as_ref(),
             src: Language::default(),
@@ -406,8 +401,7 @@ impl<T> Translate for T
         }
     }
 
-    fn from_lang(&self, language: Language) -> Query
-    {
+    fn from_lang(&self, language: Language) -> Query {
         Query {
             text: self.as_ref(),
             src: language,
@@ -415,4 +409,3 @@ impl<T> Translate for T
         }
     }
 }
-
