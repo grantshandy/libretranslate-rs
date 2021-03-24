@@ -1,4 +1,4 @@
-/// Errors that could be outputed by a Language.
+/// Errors that could be outputed by a [`Language`](crate::languages::Language).
 #[derive(Debug, Clone, PartialEq, Hash)]
 pub enum LanguageError {
     FormatError(String),
@@ -16,7 +16,7 @@ impl std::fmt::Display for LanguageError {
     }
 }
 
-/// Errors that could be outputed by the translator.
+/// Errors that could be outputed by [`translate`](crate::translate).
 #[derive(Debug, Clone, PartialEq, Hash)]
 pub enum TranslateError {
     HttpError(String),

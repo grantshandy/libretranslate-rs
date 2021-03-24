@@ -1,7 +1,7 @@
 use std::str::FromStr;
 use crate::error::LanguageError;
 
-/// Languages that can used for input and output of the [`translate`] function.
+/// Languages that can used for input and output of the [`translate`](crate::translate) function.
 #[derive(Debug, Clone, PartialEq, Copy, Hash)]
 pub enum Language {
     English,

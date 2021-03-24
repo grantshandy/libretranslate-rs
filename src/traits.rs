@@ -1,5 +1,6 @@
 use crate::{TranslateError, Language, translate};
 
+/// A struct created by a [`Translate`](crate::traits::Translate) that can be translated using the translate method.
 pub struct Query<'a> {
     pub text: &'a str,
     pub source: Option<Language>,
@@ -23,6 +24,7 @@ impl<'a> Query<'a> {
     }
 }
 
+/// Translate text from a [`String`](std::string::String) or [`str`](std::str) (anything that implements [`AsRef<str>`](std::convert::AsRef)).
 pub trait Translate {
     fn to_lang(&self, language: Language) -> Query;
     fn from_lang(&self, language: Language) -> Query;

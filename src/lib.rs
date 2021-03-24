@@ -7,6 +7,8 @@
 //! `libretranslate` allows you to use open source machine translation in your projects through an easy to use API that connects to the official [webpage](https://!libretranslate.com/).
 //!
 //! ## Basic Example
+//! `libretranslate` is an async library, so you'll have to use an async runtime like [`tokio`](https://crates.io/crates/tokio) or [`async-std`](https://crates.io/crates/async-std).
+//!
 //! All translations are done through the `translate()` function:
 //! ```rust
 //! use libretranslate::{translate, Language};
@@ -132,7 +134,7 @@ pub use error::{LanguageError, TranslateError};
 pub use languages::Language;
 pub use traits::{Query, Translate};
 
-/// Data that is output by the [`translate`] function.
+/// Data that is output by the [`translate`](crate::translate) function.
 #[derive(Debug, Clone, PartialEq, Hash)]
 pub struct Translation {
     pub source: Language,
@@ -141,7 +143,7 @@ pub struct Translation {
     pub output: String,
 }
 
-/// Translate text between two languages.
+/// Translate text between two [`Language`](crate::languages::Language).
 pub async fn translate<T: AsRef<str>>(
     source: Option<Language>,
     target: Language,

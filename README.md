@@ -7,7 +7,7 @@ libretranslate = "0.2.5"
 `libretranslate` allows you to use open source machine translation in your projects through an easy to use API that connects to the official [webpage](https://libretranslate.com/).
 
 ## Basic Example
-`libretranslate` is an async library, so you'll have to use an async runtime like [`tokio`](https://crates.io/crates/tokio) or [`async-std`](https://crates.io/crates/async-std)
+`libretranslate` is an async library, so you'll have to use an async runtime like [`tokio`](https://crates.io/crates/tokio) or [`async-std`](https://crates.io/crates/async-std).
 
 All translations are done through the `translate()` function:
 ```rust
@@ -86,7 +86,7 @@ fn main() {
 [See In Examples Folder](https://github.com/DefunctLizard/libretranslate-rs/blob/main/examples/parse.rs)
 
 ## String Methods
-The trait `Translate` implements `AsRef<str>`, meaning that any `&str` or `String` can be translated into any other language. 
+The trait `Translate` implements [`AsRef<str>`](https://doc.rust-lang.org/std/convert/trait.AsRef.html), meaning that any `&str` or `String` can be translated into any other language. 
 
 Here's a simple example.
 ```rust
@@ -101,14 +101,14 @@ async fn main() {
         .await
         .unwrap();
 
-    println!("output: \"{}\"", text);
+    println!("Output: \"{}\"", text);
 }
 
 ```
 
 Output:
 ```
-output: "Dies ist Text, geschrieben auf einem Computer, in Englisch."
+Output: "Dies ist Text, geschrieben auf einem Computer, in Englisch."
 ```
 
 [See In Examples Folder](https://github.com/DefunctLizard/libretranslate-rs/blob/main/examples/method.rs)
