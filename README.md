@@ -4,7 +4,7 @@ A LibreTranslate API client for Rust.
 [![Crate](https://img.shields.io/crates/v/libretranslate.svg)](https://crates.io/crates/libretranslate)
 [![API](https://docs.rs/libretranslate/badge.svg)](https://docs.rs/libretranslate)
 ```
-libretranslate = "0.2.6"
+libretranslate = "0.2.7"
 ```
 
 `libretranslate` allows you to use open source machine translation in your projects through an easy to use API that connects to the official [webpage](https://libretranslate.com/).
@@ -12,16 +12,17 @@ libretranslate = "0.2.6"
 ## Basic Example
 `libretranslate` is an async library, so you'll have to use an async runtime like [`tokio`](https://crates.io/crates/tokio) or [`async-std`](https://crates.io/crates/async-std).
 
-All translations are done through the `translate()` function:
+All translations are done through the `translate` function:
 ```rust
 use libretranslate::{translate, Language};
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let source = Language::French;
     let target = Language::English;
-    let input = "le texte français.";
+    let input = "Le texte français.";
 
-    let data = translate(Some(source), target, input).unwrap();
+    let data = translate(Some(source), target, input).await.unwrap();
 
     println!("Input {}: {}", data.source.as_pretty(), data.input);
     println!("Output {}: {}", data.target.as_pretty(), data.output);
