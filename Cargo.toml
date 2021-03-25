@@ -1,6 +1,6 @@
 [package]
 name = "libretranslate"
-version = "0.2.5"
+version = "0.2.6"
 authors = ["Grant Handy <grantshandy@gmail.com>", "Rafael G. Dantas <rafagd@gmail.com>"]
 edition = "2018"
 license = "MIT"

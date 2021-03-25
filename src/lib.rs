@@ -1,10 +1,10 @@
 //! # libretranslate-rs
-//! A LibreTranslate API for Rust.
+//! A LibreTranslate API client for Rust.
 //! ```
-//! libretranslate = "0.2.5"
+//! libretranslate = "0.2.6"
 //! ```
 //!
-//! `libretranslate` allows you to use open source machine translation in your projects through an easy to use API that connects to the official [webpage](https://!libretranslate.com/).
+//! `libretranslate` allows you to use open source machine translation in your projects through an easy to use API that connects to the official [webpage](https://libretranslate.com/).
 //!
 //! ## Basic Example
 //! `libretranslate` is an async library, so you'll have to use an async runtime like [`tokio`](https://crates.io/crates/tokio) or [`async-std`](https://crates.io/crates/async-std).
@@ -31,20 +31,23 @@
 //! Output English: the French text.
 //! ```
 //!
+//! [See In Examples Folder](https://github.com/DefunctLizard/libretranslate-rs/blob/main/examples/basic.rs)
+//!
 //! ## Language Detection
-//! `libretranslate` uses [`whatlang`](https://!crates.io/crates/whatlang) to detect language so you can translate unknown languages into a target language of your choice.
+//! `libretranslate` uses [`whatlang`](https://crates.io/crates/whatlang) to detect language so you can translate unknown languages into a target language of your choice.
 //!
 //! `whatlang` isn't perfect though, and for short sentences it can be very bad at detecting language. `whatlang` can detect more languages than `libretranslate` can translate, so if it detects your input as a language that `libretranslate` can't translate, the `translate` function will return a `TranslateError::DetectError`.
 //!
 //! Here's a simple example.
 //! ```rust
-//! use libretranslate::{Language, translate};
+//! use libretranslate::{translate, Language};
 //!
-//! fn main() {
+//! #[tokio::main]
+//! async fn main() {
 //!     let target = Language::English;
 //!     let text = "le texte français.";
 //!
-//!     let data = translate(None, target, text).unwrap();
+//!     let data = translate(None, target, text).await.unwrap();
 //!
 //!     println!("Input {}: {}", data.source.as_pretty(), data.input);
 //!     println!("Output {}: {}", data.target.as_pretty(), data.output);
@@ -56,6 +59,8 @@
 //! Input French: le texte français.
 //! Output English: the French text.
 //! ```
+//!
+//! [See In Examples Folder](https://github.com/DefunctLizard/libretranslate-rs/blob/main/examples/detect.rs)
 //!
 //! ## Language Functionality
 //! The `Language` enum has a lot of functionality so you can create a `Language` from all sorts of different user inputs.
@@ -69,45 +74,44 @@
 //! use libretranslate::Language;
 //!
 //! fn main() {
-//!     let english = Language::from("EnGlIsH").unwrap();
-//!     let chinese = "zh".parse::<Language>().unwrap().as_pretty();
-//!     let french  = "FRENCH".parse::<Language>().unwrap().as_code();
+//!     let lang = Language::English;
+//!     let lang_parse = "english".parse::<Language>().unwrap();
 //!
-//!     println!("\"EnGlIsH\" parsed to code: {}", english);
-//!     println!("\"zh\" parsed to pretty: {}", chinese);
-//!     println!("\"FRENCH\" parsed to code: {}", french);
+//!     assert_eq!(lang, lang_parse);
+//!     assert_eq!("en", lang.as_code());
+//!     assert_eq!("English", lang.as_pretty());
 //! }
 //! ```
 //!
-//! Output:
-//! ```
-//! "EnGlIsH" parsed to code: en
-//! "zh" parsed to pretty: Chinese
-//! "FRENCH" parsed to code: fr
-//! ```
+//! [See In Examples Folder](https://github.com/DefunctLizard/libretranslate-rs/blob/main/examples/parse.rs)
 //!
 //! ## String Methods
-//! The trait `Translate` implements `AsRef<str>`, meaning that any `&str` or `String` can be translated into any other language. These methods use `whatlang`, so be careful that your text is clearly apart of a certain language and not vague/short.
+//! The trait `Translate` implements [`AsRef<str>`](https://doc.rust-lang.org/std/convert/trait.AsRef.html), meaning that any `&str` or `String` can be translated into any other language. 
 //!
 //! Here's a simple example.
 //! ```rust
 //! use libretranslate::{Language, Translate};
 //!
-//! fn main() {
+//! #[tokio::main]
+//! async fn main() {
 //!     let text = "This is text, written on a computer, in English."
+//!         .to_lang(Language::German)
 //!         .from_lang(Language::English)
-//!         .to_lang(Language::French)
 //!         .translate()
+//!         .await
 //!         .unwrap();
 //!
-//!     println!("{}", text);
+//!     println!("Output: \"{}\"", text);
 //! }
+//!
 //! ```
 //!
 //! Output:
 //! ```
-//! detect a language and script by a given text.
+//! Output: "Dies ist Text, geschrieben auf einem Computer, in Englisch."
 //! ```
+//!
+//! [See In Examples Folder](https://github.com/DefunctLizard/libretranslate-rs/blob/main/examples/method.rs)
 //!
 //! ## Available Languages
 //! - English
@@ -121,7 +125,7 @@
 //! - Russian
 //! - Spanish
 //!
-//! Written in Rust, with love by [Grant Handy](mailto://!grantshandy@gmail.com).
+//! Written in Rust, with love by [Grant Handy](mailto://grantshandy@gmail.com).
 
 pub mod error;
 pub mod languages;

@@ -1,7 +1,7 @@
 # libretranslate-rs
 A LibreTranslate API client for Rust.
 ```
-libretranslate = "0.2.5"
+libretranslate = "0.2.6"
 ```
 
 `libretranslate` allows you to use open source machine translation in your projects through an easy to use API that connects to the official [webpage](https://libretranslate.com/).
