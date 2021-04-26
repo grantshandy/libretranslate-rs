@@ -132,7 +132,7 @@ pub mod languages;
 pub mod traits;
 
 use serde_json::Value;
-use whatlang::Lang;
+use whatlang::{Lang, Detector};
 
 pub use error::{LanguageError, TranslateError};
 pub use languages::Language;
@@ -160,27 +160,9 @@ pub async fn translate<T: AsRef<str>>(
     let source = match source {
         Some(data) => data,
         None => {
-			let allowlist = vec![Lang::Eng, Lang::Ara, Lang::Fra, Lang::Deu, Lang::Ita, Lang::Por, Lang::Rus, Lang::Spa, Lang::Jpn];
-
-			let detector = Detector::with_allowlist(allowlist);
-
-
-            let info = match detector.detect_lang(input.as_ref()) {
-                Some(data) => data,
-                None => return Err(TranslateError::DetectError),
-            };
-
-            match info.lang() {
-                Lang::Eng => Language::English,
-                Lang::Ara => Language::Arabic,
-                Lang::Fra => Language::French,
-                Lang::Deu => Language::German,
-                Lang::Ita => Language::Italian,
-                Lang::Por => Language::Portuguese,
-                Lang::Rus => Language::Russian,
-                Lang::Spa => Language::Spanish,
-                Lang::Jpn => Language::Japanese,
-                _ => return Err(TranslateError::DetectError),
+            match detect(input.as_ref()) {
+                Ok(data) => data,
+                Err(error) => return Err(error),
             }
         }
     };
@@ -226,9 +208,38 @@ async fn get_raw_data(source: Language, target: Language, input: &str) -> Result
         "target": target.as_code(),
     });
 
+    println!("Running HTTP Post Request!");
+    println!("URL: {}", uri);
+    println!("JSON POST Body:\n{}", data.to_string());
     let res = surf::post(uri)
         .body(surf::http::Body::from_json(&data)?)
         .recv_string().await?;
 
     Ok(res)
+}
+
+pub fn detect<T: AsRef<str>>(text: T) -> Result<Language, TranslateError> {
+    let allowlist = vec![Lang::Eng, Lang::Ara, Lang::Fra, Lang::Deu, Lang::Ita, Lang::Por, Lang::Rus, Lang::Spa, Lang::Jpn];
+
+    let detector = Detector::with_allowlist(allowlist);
+
+    let info = match detector.detect_lang(text.as_ref()) {
+        Some(data) => data,
+        None => return Err(TranslateError::DetectError),
+    };
+
+    let info = match info {
+        Lang::Eng => Language::English,
+        Lang::Ara => Language::Arabic,
+        Lang::Fra => Language::French,
+        Lang::Deu => Language::German,
+        Lang::Ita => Language::Italian,
+        Lang::Por => Language::Portuguese,
+        Lang::Rus => Language::Russian,
+        Lang::Spa => Language::Spanish,
+        Lang::Jpn => Language::Japanese,
+        _ => return Err(TranslateError::DetectError),
+    };
+
+    return Ok(info);
 }
