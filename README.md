@@ -1,8 +1,10 @@
+
 # libretranslate-rs
 A LibreTranslate API client for Rust.
 
 [![Crate](https://img.shields.io/crates/v/libretranslate.svg)](https://crates.io/crates/libretranslate)
 [![API](https://docs.rs/libretranslate/badge.svg)](https://docs.rs/libretranslate)
+[![Gitpod ready-to-code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/grantshandy/libretranslate-rs)
 ```
 libretranslate = "0.2.7"
 ```
