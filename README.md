@@ -7,7 +7,7 @@ A LibreTranslate API client for Rust.
 [![API](https://docs.rs/libretranslate/badge.svg)](https://docs.rs/libretranslate)
 [![Gitpod ready-to-code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/grantshandy/libretranslate-rs)
 ```
-libretranslate = "0.2.7"
+libretranslate = "0.2.8"
 ```
 
 `libretranslate` allows you to use open source machine translation in your projects through an easy to use API that connects to the official [webpage](https://libretranslate.com/).
@@ -38,7 +38,7 @@ Input French: le texte français.
 Output English: the French text.
 ```
 
-[See In Examples Folder](https://github.com/DefunctLizard/libretranslate-rs/blob/main/examples/basic.rs)
+[See In Examples Folder](https://github.com/grantshandy/libretranslate-rs/blob/main/examples/basic.rs)
 
 ## Language Detection
 `libretranslate` uses [`whatlang`](https://crates.io/crates/whatlang) to detect language so you can translate unknown languages into a target language of your choice.
@@ -67,7 +67,7 @@ Input French: le texte français.
 Output English: the French text.
 ```
 
-[See In Examples Folder](https://github.com/DefunctLizard/libretranslate-rs/blob/main/examples/detect.rs)
+[See In Examples Folder](https://github.com/grantshandy/libretranslate-rs/blob/main/examples/detect.rs)
 
 ## Language Functionality
 The `Language` enum has a lot of functionality so you can create a `Language` from all sorts of different user inputs.
@@ -90,7 +90,7 @@ fn main() {
 }
 ```
 
-[See In Examples Folder](https://github.com/DefunctLizard/libretranslate-rs/blob/main/examples/parse.rs)
+[See In Examples Folder](https://github.com/grantshandy/libretranslate-rs/blob/main/examples/language.rs)
 
 ## String Methods
 The trait `Translate` implements [`AsRef<str>`](https://doc.rust-lang.org/std/convert/trait.AsRef.html), meaning that any `&str` or `String` can be translated into any other language. 
@@ -118,7 +118,7 @@ Output:
 Output: "Dies ist Text, geschrieben auf einem Computer, in Englisch."
 ```
 
-[See In Examples Folder](https://github.com/DefunctLizard/libretranslate-rs/blob/main/examples/method.rs)
+[See In Examples Folder](https://github.com/grantshandy/libretranslate-rs/blob/main/examples/method.rs)
 
 ## Available Languages
 - English

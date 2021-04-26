@@ -1,7 +1,12 @@
 //! # libretranslate-rs
+//! [![Crates.io](https://img.shields.io/crates/v/libretranslate.svg)](https://crates.io/crates/libretranslate)
+//! [![Crates.io](https://img.shields.io/crates/d/libretranslate)](https://crates.io/crates/libretranslate)
+//! [![API](https://docs.rs/libretranslate/badge.svg)](https://docs.rs/libretranslate)
+//! [![Gitpod ready-to-code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/grantshandy/libretranslate-rs)
+//! 
 //! A LibreTranslate API client for Rust.
 //! ```
-//! libretranslate = "0.2.7"
+//! libretranslate = "0.2.8"
 //! ```
 //!
 //! `libretranslate` allows you to use open source machine translation in your projects through an easy to use API that connects to the official [webpage](https://libretranslate.com/).
@@ -31,7 +36,7 @@
 //! Output English: the French text.
 //! ```
 //!
-//! [See In Examples Folder](https://github.com/DefunctLizard/libretranslate-rs/blob/main/examples/basic.rs)
+//! [See In Examples Folder](https://github.com/grantshandy/libretranslate-rs/blob/main/examples/basic.rs)
 //!
 //! ## Language Detection
 //! `libretranslate` uses [`whatlang`](https://crates.io/crates/whatlang) to detect language so you can translate unknown languages into a target language of your choice.
@@ -60,7 +65,7 @@
 //! Output English: the French text.
 //! ```
 //!
-//! [See In Examples Folder](https://github.com/DefunctLizard/libretranslate-rs/blob/main/examples/detect.rs)
+//! [See In Examples Folder](https://github.com/grantshandy/libretranslate-rs/blob/main/examples/detect.rs)
 //!
 //! ## Language Functionality
 //! The `Language` enum has a lot of functionality so you can create a `Language` from all sorts of different user inputs.
@@ -83,7 +88,7 @@
 //! }
 //! ```
 //!
-//! [See In Examples Folder](https://github.com/DefunctLizard/libretranslate-rs/blob/main/examples/parse.rs)
+//! [See In Examples Folder](https://github.com/grantshandy/libretranslate-rs/blob/main/examples/language.rs)
 //!
 //! ## String Methods
 //! The trait `Translate` implements [`AsRef<str>`](https://doc.rust-lang.org/std/convert/trait.AsRef.html), meaning that any `&str` or `String` can be translated into any other language. 
@@ -111,7 +116,7 @@
 //! Output: "Dies ist Text, geschrieben auf einem Computer, in Englisch."
 //! ```
 //!
-//! [See In Examples Folder](https://github.com/DefunctLizard/libretranslate-rs/blob/main/examples/method.rs)
+//! [See In Examples Folder](https://github.com/grantshandy/libretranslate-rs/blob/main/examples/method.rs)
 //!
 //! ## Available Languages
 //! - English
@@ -218,6 +223,7 @@ async fn get_raw_data(source: Language, target: Language, input: &str) -> Result
     Ok(res)
 }
 
+/// Detect the language without using [`translate`].
 pub fn detect<T: AsRef<str>>(text: T) -> Result<Language, TranslateError> {
     let allowlist = vec![Lang::Eng, Lang::Ara, Lang::Fra, Lang::Deu, Lang::Ita, Lang::Por, Lang::Rus, Lang::Spa, Lang::Jpn];
 
