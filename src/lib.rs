@@ -160,7 +160,12 @@ pub async fn translate<T: AsRef<str>>(
     let source = match source {
         Some(data) => data,
         None => {
-            let info = match whatlang::detect(input.as_ref()) {
+			let allowlist = vec![Lang::Eng, Lang::Ara, Lang::Fra, Lang::Deu, Lang::Ita, Lang::Por, Lang::Rus, Lang::Spa, Lang::Jpn];
+
+			let detector = Detector::with_allowlist(allowlist);
+
+
+            let info = match detector.detect_lang(input.as_ref()) {
                 Some(data) => data,
                 None => return Err(TranslateError::DetectError),
             };
