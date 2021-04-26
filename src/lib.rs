@@ -208,9 +208,9 @@ async fn get_raw_data(source: Language, target: Language, input: &str) -> Result
         "target": target.as_code(),
     });
 
-    println!("Running HTTP Post Request!");
-    println!("URL: {}", uri);
-    println!("JSON POST Body:\n{}", data.to_string());
+    // println!("Running HTTP Post Request!");
+    // println!("URL: {}", uri);
+    // println!("JSON POST Body:\n{}", data.to_string());
     let res = surf::post(uri)
         .body(surf::http::Body::from_json(&data)?)
         .recv_string().await?;
