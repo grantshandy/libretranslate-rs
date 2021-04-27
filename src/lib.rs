@@ -6,7 +6,7 @@
 //! 
 //! A LibreTranslate API client for Rust.
 //! ```
-//! libretranslate = "0.2.8"
+//! libretranslate = "0.2.9"
 //! ```
 //!
 //! `libretranslate` allows you to use open source machine translation in your projects through an easy to use API that connects to the official [webpage](https://libretranslate.com/).
@@ -23,7 +23,7 @@
 //!     let target = Language::English;
 //!     let input = "le texte français.";
 //!
-//!     let data = translate(Some(source), target, input).unwrap();
+//!     let data = translate(source, target, input).unwrap();
 //!
 //!     println!("Input {}: {}", data.source.as_pretty(), data.input);
 //!     println!("Output {}: {}", data.target.as_pretty(), data.output);
@@ -39,10 +39,6 @@
 //! [See In Examples Folder](https://github.com/grantshandy/libretranslate-rs/blob/main/examples/basic.rs)
 //!
 //! ## Language Detection
-//! `libretranslate` uses [`whatlang`](https://crates.io/crates/whatlang) to detect language so you can translate unknown languages into a target language of your choice.
-//!
-//! `whatlang` isn't perfect though, and for short sentences it can be very bad at detecting language. `whatlang` can detect more languages than `libretranslate` can translate, so if it detects your input as a language that `libretranslate` can't translate, the `translate` function will return a `TranslateError::DetectError`.
-//!
 //! Here's a simple example.
 //! ```rust
 //! use libretranslate::{translate, Language};
@@ -52,7 +48,7 @@
 //!     let target = Language::English;
 //!     let text = "le texte français.";
 //!
-//!     let data = translate(None, target, text).await.unwrap();
+//!     let data = translate(Language::Detect, target, text).await.unwrap();
 //!
 //!     println!("Input {}: {}", data.source.as_pretty(), data.input);
 //!     println!("Output {}: {}", data.target.as_pretty(), data.output);
@@ -137,7 +133,6 @@ pub mod languages;
 pub mod traits;
 
 use serde_json::Value;
-use whatlang::{Lang, Detector};
 
 pub use error::{LanguageError, TranslateError};
 pub use languages::Language;
@@ -153,31 +148,42 @@ pub struct Translation {
 }
 
 /// Translate text between two [`Language`](crate::languages::Language).
-pub async fn translate<T: AsRef<str>>(
-    source: Option<Language>,
-    target: Language,
-    input: T,
-) -> Result<Translation, TranslateError> {
+pub async fn translate<T: AsRef<str>>(source: Language, target: Language, input: T) -> Result<Translation, TranslateError> {
+    let url = "https://libretranslate.com/translate";
+
+    let data = match translate_url(url, source, target, input.as_ref()).await {
+        Ok(data) => data,
+        Err(error) => return Err(error),
+    };
+  
+    return Ok(data);
+}
+
+/// Translate using a custom URL.
+pub async fn translate_url<T: AsRef<str>>(url: T, source: Language, target: Language, input: T) -> Result<Translation, TranslateError> {
     if input.as_ref().chars().count() >= 5000 {
         return Err(TranslateError::LengthError);
     };
 
-    let source = match source {
-        Some(data) => data,
-        None => {
-            match detect(input.as_ref()) {
-                Ok(data) => data,
-                Err(error) => return Err(error),
-            }
-        }
-    };
+    let data = serde_json::json!({
+        "q": input.as_ref(),
+        "source": source.as_code(),
+        "target": target.as_code(),
+    });
 
-    let data = match get_raw_data(source, target, input.as_ref()).await {
+    let body = match surf::http::Body::from_json(&data) {
         Ok(data) => data,
         Err(error) => return Err(TranslateError::HttpError(error.to_string())),
     };
-  
-    let parsed_json: Value = match serde_json::from_str(&data) {
+
+    let res = match surf::post(url.as_ref())
+        .body(body)
+        .recv_string().await {
+        Ok(data) => data,
+        Err(error) => return Err(TranslateError::HttpError(error.to_string())),
+    };
+    
+    let parsed_json: Value = match serde_json::from_str(&res) {
         Ok(parsed_json) => parsed_json,
         Err(error) => {
             return Err(TranslateError::ParseError(error.to_string()));
@@ -202,50 +208,4 @@ pub async fn translate<T: AsRef<str>>(
         input,
         output,
     });
-}
-
-async fn get_raw_data(source: Language, target: Language, input: &str) -> Result<String, surf::http::Error> {
-    let uri = "https://libretranslate.com/translate";
-
-    let data = serde_json::json!({
-        "q": input,
-        "source": source.as_code(),
-        "target": target.as_code(),
-    });
-
-    // println!("Running HTTP Post Request!");
-    // println!("URL: {}", uri);
-    // println!("JSON POST Body:\n{}", data.to_string());
-    let res = surf::post(uri)
-        .body(surf::http::Body::from_json(&data)?)
-        .recv_string().await?;
-
-    Ok(res)
-}
-
-/// Detect the language without using [`translate`].
-pub fn detect<T: AsRef<str>>(text: T) -> Result<Language, TranslateError> {
-    let allowlist = vec![Lang::Eng, Lang::Ara, Lang::Fra, Lang::Deu, Lang::Ita, Lang::Por, Lang::Rus, Lang::Spa, Lang::Jpn];
-
-    let detector = Detector::with_allowlist(allowlist);
-
-    let info = match detector.detect_lang(text.as_ref()) {
-        Some(data) => data,
-        None => return Err(TranslateError::DetectError),
-    };
-
-    let info = match info {
-        Lang::Eng => Language::English,
-        Lang::Ara => Language::Arabic,
-        Lang::Fra => Language::French,
-        Lang::Deu => Language::German,
-        Lang::Ita => Language::Italian,
-        Lang::Por => Language::Portuguese,
-        Lang::Rus => Language::Russian,
-        Lang::Spa => Language::Spanish,
-        Lang::Jpn => Language::Japanese,
-        _ => return Err(TranslateError::DetectError),
-    };
-
-    return Ok(info);
 }

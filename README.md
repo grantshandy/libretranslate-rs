@@ -7,7 +7,7 @@ A LibreTranslate API client for Rust.
 [![API](https://docs.rs/libretranslate/badge.svg)](https://docs.rs/libretranslate)
 [![Gitpod ready-to-code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/grantshandy/libretranslate-rs)
 ```
-libretranslate = "0.2.8"
+libretranslate = "0.2.9"
 ```
 
 `libretranslate` allows you to use open source machine translation in your projects through an easy to use API that connects to the official [webpage](https://libretranslate.com/).

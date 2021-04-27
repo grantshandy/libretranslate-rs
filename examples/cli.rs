@@ -10,12 +10,31 @@ use libretranslate::{translate, Language};
 async fn main() {
     let args = &std::env::args().collect::<Vec<_>>();
 
-    let source = args[1].parse::<Language>().unwrap();
-    let target = args[2].parse::<Language>().unwrap();
+    if args.len() != 4 {
+        eprintln!("FORMAT: <INPUT LANGUAGE> <OUTPUT LANGUAGE> <INPUT TEXT>");
+        std::process::exit(1);
+    };
+
+    let source = match args[1].parse::<Language>() {
+        Ok(source) => source,
+        Err(_) => {
+            eprintln!("{} is not a valid language.", args[1]);
+            std::process::exit(1);
+        }
+    };
+
+    let target = match args[2].parse::<Language>() {
+        Ok(source) => source,
+        Err(_) => {
+            eprintln!("{} is not a valid language.", args[2]);
+            std::process::exit(1);
+        }
+    };
+
     let input = &args[3];
 
-    let data = translate(Some(source), target, input).await.unwrap();
-
-    println!("Input {}: {}", data.source.as_pretty(), data.input);
-    println!("Output {}: {}", data.target.as_pretty(), data.output);
+    match translate(source, target, input).await {
+        Ok(data) => println!("{}", data.output),
+        Err(error) => println!("Error: {}", error),
+    };
 }

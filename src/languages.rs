@@ -4,6 +4,7 @@ use crate::error::LanguageError;
 /// Languages that can used for input and output of the [`translate`](crate::translate) function.
 #[derive(Debug, Clone, PartialEq, Copy, Hash)]
 pub enum Language {
+    Detect,
     English,
     Arabic,
     Chinese,
@@ -20,6 +21,7 @@ impl Language {
     /// Return the language with the language code name. (ex. "ar", "de")
     pub fn as_code(&self) -> &'static str {
         match self {
+            Language::Detect => "auto",
             Language::English => "en",
             Language::Arabic => "ar",
             Language::Chinese => "zh",
@@ -36,6 +38,7 @@ impl Language {
     /// Return the Language with the full English name. (ex. "Arabic", "German")
     pub fn as_pretty(&self) -> &'static str {
         match self {
+            Language::Detect => "Detected",
             Language::English => "English",
             Language::Arabic => "Arabic",
             Language::Chinese => "Chinese",
@@ -95,6 +98,7 @@ impl FromStr for Language {
 impl std::fmt::Display for Language {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
+            Language::Detect => write!(f, "auto"),
             Language::English => write!(f, "en"),
             Language::Arabic => write!(f, "ar"),
             Language::Chinese => write!(f, "zh"),
