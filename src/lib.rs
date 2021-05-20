@@ -152,11 +152,8 @@ pub struct Translation {
 pub async fn translate<T: AsRef<str>>(source: Language, target: Language, input: T) -> Result<Translation, TranslateError> {
     let url = "https://libretranslate.com/";
 
-    let data = match translate_url(source, target, input.as_ref(), url).await {
-        Ok(data) => data,
-        Err(error) => return Err(error),
-    };
-  
+    let data = translate_url(source, target, input.as_ref(), url).await?;
+
     return Ok(data);
 }
 

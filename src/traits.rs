@@ -37,7 +37,7 @@ where
     fn to_lang(&self, language: Language) -> Query {
         Query {
             text: self.as_ref(),
-            source: Language::default(),
+            source: Language::Detect,
             target: language,
         }
     }
