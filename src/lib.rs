@@ -201,6 +201,11 @@ pub async fn translate_url<T: AsRef<str>>(source: Language, target: Language, in
         }
     };
 
+    match &parsed_json["error"] {
+        Value::String(error) => return Err(TranslateError::ParseError(error.to_string())),
+        _ => (),
+    };
+
     let output = match &parsed_json["translatedText"] {
         Value::String(output) => output,
         _ => {
