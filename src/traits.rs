@@ -2,6 +2,7 @@ use crate::{TranslateError, Language};
 
 /// A struct created by a [`Translate`](crate::traits::Translate) that can be translated using the translate method.
 pub struct Query<'a> {
+    url: &'a str,
     pub text: &'a str,
     pub source: Language,
     pub target: Language,
@@ -18,8 +19,13 @@ impl<'a> Query<'a> {
         self
     }
 
-    pub async fn translate(self) -> Result<String, TranslateError> {
-        let res = crate::translate(self.source, self.target, self.text).await?;
+    pub fn url<T: AsRef<str>>(mut self, url: &'a T) -> Query<'a> {
+        self.url = url.as_ref();
+        self
+    }
+
+    pub async fn translate_url(self) -> Result<String, TranslateError> {
+        let res = crate::translate_url(self.source, self.target, self.text, self.url).await?;
         Ok(res.output)
     }
 }
@@ -36,6 +42,7 @@ where
 {
     fn to_lang(&self, language: Language) -> Query {
         Query {
+            url: "https://libretranslate.com/",
             text: self.as_ref(),
             source: Language::Detect,
             target: language,
@@ -44,6 +51,7 @@ where
 
     fn from_lang(&self, language: Language) -> Query {
         Query {
+            url: "https://libretranslate.com/",
             text: self.as_ref(),
             source: language,
             target: Language::default(),
