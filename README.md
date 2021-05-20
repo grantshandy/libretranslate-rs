@@ -1,13 +1,12 @@
-
 # libretranslate-rs
-A LibreTranslate API client for Rust.
-
 [![Crates.io](https://img.shields.io/crates/v/libretranslate.svg)](https://crates.io/crates/libretranslate)
 [![Crates.io](https://img.shields.io/crates/d/libretranslate)](https://crates.io/crates/libretranslate)
 [![API](https://docs.rs/libretranslate/badge.svg)](https://docs.rs/libretranslate)
 [![Gitpod ready-to-code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/grantshandy/libretranslate-rs)
+
+A LibreTranslate API client for Rust.
 ```
-libretranslate = "0.2.9"
+libretranslate = "0.3.0"
 ```
 
 `libretranslate` allows you to use open source machine translation in your projects through an easy to use API that connects to the official [webpage](https://libretranslate.com/).
@@ -15,17 +14,16 @@ libretranslate = "0.2.9"
 ## Basic Example
 `libretranslate` is an async library, so you'll have to use an async runtime like [`tokio`](https://crates.io/crates/tokio) or [`async-std`](https://crates.io/crates/async-std).
 
-All translations are done through the `translate` function:
+All translations are done through the [`translate`](crate::translate) function:
 ```rust
 use libretranslate::{translate, Language};
 
-#[tokio::main]
-async fn main() {
+fn main() {
     let source = Language::French;
     let target = Language::English;
-    let input = "Le texte français.";
+    let input = "le texte français.";
 
-    let data = translate(Some(source), target, input).await.unwrap();
+    let data = translate(source, target, input).unwrap();
 
     println!("Input {}: {}", data.source.as_pretty(), data.input);
     println!("Output {}: {}", data.target.as_pretty(), data.output);
@@ -41,10 +39,6 @@ Output English: the French text.
 [See In Examples Folder](https://github.com/grantshandy/libretranslate-rs/blob/main/examples/basic.rs)
 
 ## Language Detection
-`libretranslate` uses [`whatlang`](https://crates.io/crates/whatlang) to detect language so you can translate unknown languages into a target language of your choice.
-
-`whatlang` isn't perfect though, and for short sentences it can be very bad at detecting language. `whatlang` can detect more languages than `libretranslate` can translate, so if it detects your input as a language that `libretranslate` can't translate, the `translate` function will return a `TranslateError::DetectError`.
-
 Here's a simple example.
 ```rust
 use libretranslate::{translate, Language};
@@ -54,7 +48,7 @@ async fn main() {
     let target = Language::English;
     let text = "le texte français.";
 
-    let data = translate(None, target, text).await.unwrap();
+    let data = translate(Language::Detect, target, text).await.unwrap();
 
     println!("Input {}: {}", data.source.as_pretty(), data.input);
     println!("Output {}: {}", data.target.as_pretty(), data.output);

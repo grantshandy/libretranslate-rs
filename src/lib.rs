@@ -6,7 +6,7 @@
 //! 
 //! A LibreTranslate API client for Rust.
 //! ```
-//! libretranslate = "0.2.9"
+//! libretranslate = "0.3.0"
 //! ```
 //!
 //! `libretranslate` allows you to use open source machine translation in your projects through an easy to use API that connects to the official [webpage](https://libretranslate.com/).
@@ -141,6 +141,7 @@ pub use traits::{Query, Translate};
 /// Data that is output by the [`translate`](crate::translate) function.
 #[derive(Debug, Clone, PartialEq, Hash)]
 pub struct Translation {
+    pub url: String,
     pub source: Language,
     pub target: Language,
     pub input: String,
@@ -149,9 +150,9 @@ pub struct Translation {
 
 /// Translate text between two [`Language`](crate::languages::Language).
 pub async fn translate<T: AsRef<str>>(source: Language, target: Language, input: T) -> Result<Translation, TranslateError> {
-    let url = "https://libretranslate.com/translate";
+    let url = "https://libretranslate.com/";
 
-    let data = match translate_url(url, source, target, input.as_ref()).await {
+    let data = match translate_url(source, target, input.as_ref(), url).await {
         Ok(data) => data,
         Err(error) => return Err(error),
     };
@@ -160,7 +161,15 @@ pub async fn translate<T: AsRef<str>>(source: Language, target: Language, input:
 }
 
 /// Translate using a custom URL.
-pub async fn translate_url<T: AsRef<str>>(url: T, source: Language, target: Language, input: T) -> Result<Translation, TranslateError> {
+pub async fn translate_url<T: AsRef<str>>(source: Language, target: Language, input: T, url: T) -> Result<Translation, TranslateError> {
+    let complete_url: String;
+
+    if url.as_ref().chars().last().unwrap() == '/' {
+        complete_url = format!("{}translate", url.as_ref());
+    } else {
+        complete_url = format!("{}/translate", url.as_ref());
+    };
+
     if input.as_ref().chars().count() >= 5000 {
         return Err(TranslateError::LengthError);
     };
@@ -176,7 +185,9 @@ pub async fn translate_url<T: AsRef<str>>(url: T, source: Language, target: Lang
         Err(error) => return Err(TranslateError::HttpError(error.to_string())),
     };
 
-    let res = match surf::post(url.as_ref())
+    let url = complete_url.clone();
+
+    let res = match surf::post(complete_url)
         .body(body)
         .recv_string().await {
         Ok(data) => data,
@@ -203,6 +214,7 @@ pub async fn translate_url<T: AsRef<str>>(url: T, source: Language, target: Lang
     let output = output.to_string();
 
     return Ok(Translation {
+        url,
         source,
         target,
         input,

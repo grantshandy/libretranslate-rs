@@ -3,7 +3,6 @@
 
 // The translated text goes in quotation marks.
 
-
 use libretranslate::{translate, Language};
 
 #[tokio::main]
