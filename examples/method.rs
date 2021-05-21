@@ -7,6 +7,7 @@ async fn main() {
     let text = "This is text, written on a computer, in English."
         .to_lang(Language::German)
         .from_lang(Language::English)
+        .url("https://libretranslate.de/")
         .translate()
         .await
         .unwrap();

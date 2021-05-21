@@ -1,12 +1,13 @@
 //! # libretranslate-rs
-//! [![Crates.io](https://img.shields.io/crates/v/libretranslate.svg)](https://crates.io/crates/libretranslate)
+//!! [![Crates.io](https:img.shields.io/crates/v/libretranslate.svg)](https://crates.io/crates/libretranslate)
 //! [![Crates.io](https://img.shields.io/crates/d/libretranslate)](https://crates.io/crates/libretranslate)
 //! [![API](https://docs.rs/libretranslate/badge.svg)](https://docs.rs/libretranslate)
 //! [![Gitpod ready-to-code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/grantshandy/libretranslate-rs)
-//! 
+//! ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/grantshandy/libretranslate-rs/Rust)
+//!
 //! A LibreTranslate API client for Rust.
 //! ```
-//! libretranslate = "0.3.1"
+//! libretranslate = "0.4.0"
 //! ```
 //!
 //! `libretranslate` allows you to use open source machine translation in your projects through an easy to use API that connects to the official [webpage](https://libretranslate.com/).
@@ -18,12 +19,13 @@
 //! ```rust
 //! use libretranslate::{translate, Language};
 //!
-//! fn main() {
+//! #[tokio::main]
+//! async fn main() {
 //!     let source = Language::French;
 //!     let target = Language::English;
-//!     let input = "le texte français.";
+//!     let input = "Le texte français.";
 //!
-//!     let data = translate(source, target, input).unwrap();
+//!     let data = translate(source, target, input).await.unwrap();
 //!
 //!     println!("Input {}: {}", data.source.as_pretty(), data.input);
 //!     println!("Output {}: {}", data.target.as_pretty(), data.output);
@@ -102,9 +104,8 @@
 //!         .await
 //!         .unwrap();
 //!
-//!     println!("Output: \"{}\"", text);
+//!     println!("output: \"{}\"", text);
 //! }
-//!
 //! ```
 //!
 //! Output:
@@ -126,17 +127,19 @@
 //! - Russian
 //! - Spanish
 //!
-//! Written in Rust, with love by [Grant Handy](mailto://grantshandy@gmail.com).
+//!! Written with love, in Rust by [Grant Handy](mailto://grantshandy@gmail.com).
 
 pub mod error;
 pub mod languages;
 pub mod traits;
+pub mod builder;
 
 use serde_json::Value;
 
 pub use error::{LanguageError, TranslateError};
 pub use languages::Language;
 pub use traits::{Query, Translate};
+pub use builder::TranslationBuilder;
 
 /// Data that is output by the [`translate`](crate::translate) function.
 #[derive(Debug, Clone, PartialEq, Hash)]
@@ -146,58 +149,6 @@ pub struct Translation {
     pub target: Language,
     pub input: String,
     pub output: String,
-}
-
-#[derive(Debug, Clone, PartialEq, Hash)]
-pub struct TranslationBuilder {
-    pub url: String,
-    pub source: Language,
-    pub target: Language,
-    pub input: String,
-}
-
-impl TranslationBuilder {
-    pub fn new() -> Self {
-        Self {
-            url: String::from("https://libretranslate.com/"),
-            source: Language::Detect,
-            target: Language::default(),
-            input: String::new(),
-        }
-    }
-
-    pub fn url<T: AsRef<str>>(mut self, url: T) -> Self {
-        self.url = url.as_ref().to_string();
-        self
-    }
-    
-    pub fn from_lang(mut self, lang: Language) -> Self {
-        self.source = lang;
-        self
-    }
-
-    pub fn to_lang(mut self, lang: Language) -> Self {
-        self.target = lang;
-        self
-    }
-
-    pub fn text<T: AsRef<str>>(mut self, text: T) -> Self {
-        self.input = text.as_ref().to_string();
-        self
-    }
-
-    pub async fn translate(mut self) -> Result<String, TranslateError> {
-        if self.input == "" {
-            return Ok(String::new());
-        };
-
-        let data = translate_url(self.source, self.target, self.input, self.url).await?;
-
-        self.source = data.source;
-        self.target = data.target;
-
-        return Ok(data.output);
-    }
 }
 
 /// Translate text between two [`Language`](crate::languages::Language).

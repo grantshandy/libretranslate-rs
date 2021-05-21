@@ -7,7 +7,7 @@
 
 A LibreTranslate API client for Rust.
 ```
-libretranslate = "0.3.1"
+libretranslate = "0.4.0"
 ```
 
 `libretranslate` allows you to use open source machine translation in your projects through an easy to use API that connects to the official [webpage](https://libretranslate.com/).
@@ -19,12 +19,13 @@ All translations are done through the [`translate`](crate::translate) function:
 ```rust
 use libretranslate::{translate, Language};
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let source = Language::French;
     let target = Language::English;
-    let input = "le texte français.";
+    let input = "Le texte français.";
 
-    let data = translate(source, target, input).unwrap();
+    let data = translate(source, target, input).await.unwrap();
 
     println!("Input {}: {}", data.source.as_pretty(), data.input);
     println!("Output {}: {}", data.target.as_pretty(), data.output);
@@ -103,9 +104,8 @@ async fn main() {
         .await
         .unwrap();
 
-    println!("Output: \"{}\"", text);
+    println!("output: \"{}\"", text);
 }
-
 ```
 
 Output:
@@ -127,4 +127,4 @@ Output: "Dies ist Text, geschrieben auf einem Computer, in Englisch."
 - Russian
 - Spanish
 
-Written in Rust, with love by [Grant Handy](mailto://grantshandy@gmail.com).
+Written with love, in Rust by [Grant Handy](mailto://grantshandy@gmail.com).
