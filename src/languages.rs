@@ -1,5 +1,6 @@
 use std::str::FromStr;
 use crate::error::LanguageError;
+use unic_langid::LanguageIdentifier;
 
 /// Languages that can used for input and output of the [`translate`](crate::translate) function.
 #[derive(Debug, Clone, PartialEq, Copy, Hash)]
@@ -55,6 +56,23 @@ impl Language {
     /// Create a Language from &str like "en" or "French". Case Doesn't matter.
     pub fn from<T: AsRef<str>>(s: T) -> Result<Self, LanguageError> {
         return Self::from_str(s.as_ref());
+    }
+
+    /// Create a Language from a unic_langid::LanguageIdentifier.
+    pub fn from_unic_langid(s: LanguageIdentifier) -> Result<Self, LanguageError> {
+        match s.language.as_str() {
+            "en" => Ok(Language::English),
+            "ar" => Ok(Language::Arabic),
+            "zh" => Ok(Language::Chinese),
+            "fr" => Ok(Language::French),
+            "de" => Ok(Language::German),
+            "it" => Ok(Language::Italian),
+            "pt" => Ok(Language::Portuguese),
+            "ru" => Ok(Language::Russian),
+            "es" => Ok(Language::Spanish),
+            "ja" => Ok(Language::Japanese),
+            &_ => Err(LanguageError::FormatError("Unknown Language".to_string())),
+        }
     }
 }
 
