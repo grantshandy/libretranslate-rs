@@ -10,7 +10,7 @@ async fn main() {
 
     let input = "Amazing!";
     
-    let data = translate_url(source, target, input, "https://libretranslate.de/").await.unwrap();
+    let data = translate_url(source, target, input, "https://libretranslate.de/", None).await.unwrap();
 
     println!("URL: \"{}\"", data.url);
     println!("Input {}: \"{}\"", data.source.as_pretty(), data.input);

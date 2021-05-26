@@ -1,6 +1,6 @@
 [package]
 name = "libretranslate"
-version = "0.4.1"
+version = "0.5.0"
 authors = ["Grant Handy <grantshandy@gmail.com>", "Rafael G. Dantas <rafagd@gmail.com>"]
 edition = "2018"
 license = "MIT"
@@ -14,7 +14,14 @@ keywords = ["translate", "language", "libretranslate", "translation"]
 [dependencies]
 serde_json = "1.0.64"
 surf = "2.2.0"
-unic-langid = "0.9.0"
+unic-langid = { version = "0.9.0", optional = true }
 
 [dev-dependencies]
 tokio = { version = "1.5.0", features = ["full"]}
+
+[features]
+unicode_langid = ["unic-langid"]
+
+[[example]]
+name = "unic_langid"
+required-features = ["unicode_langid"]

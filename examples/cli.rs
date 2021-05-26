@@ -32,7 +32,7 @@ async fn main() {
 
     let input = &args[3];
 
-    match translate(source, target, input).await {
+    match translate(source, target, input, None).await {
         Ok(data) => println!("{}", data.output),
         Err(error) => println!("Error: {}", error),
     };

@@ -7,9 +7,10 @@ async fn main() {
         .from_lang(Language::French)
         .to_lang(Language::Italian)
         .url("https://libretranslate.de/")
+        // .key("YOUR-OWN-KEY")
         .translate()
         .await
         .unwrap();
 
-    println!("{}", builder);
+    println!("{}", builder.output);
 }
