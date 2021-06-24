@@ -7,7 +7,7 @@
 //!
 //! A LibreTranslate API client for Rust.
 //! ```
-//! libretranslate = "0.5.0"
+//! libretranslate = "0.5.1"
 //! ```
 //!
 //! `libretranslate` allows you to use open source machine translation in your projects through an easy to use API that connects to the official [webpage](https://libretranslate.com/).
@@ -343,6 +343,7 @@ impl FromStr for Language {
             "russian" => Ok(Language::Russian),
             "spanish" => Ok(Language::Spanish),
             "japanese" => Ok(Language::Japanese),
+            "auto" => Ok(Language::Detect)
             &_ => Err(LanguageError::FormatError(s.to_string())),
         }
     }
