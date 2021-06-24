@@ -343,7 +343,7 @@ impl FromStr for Language {
             "russian" => Ok(Language::Russian),
             "spanish" => Ok(Language::Spanish),
             "japanese" => Ok(Language::Japanese),
-            "auto" => Ok(Language::Detect)
+            "auto" => Ok(Language::Detect),
             &_ => Err(LanguageError::FormatError(s.to_string())),
         }
     }
