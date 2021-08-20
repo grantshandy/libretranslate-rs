@@ -6,7 +6,9 @@ async fn main() {
     let target = Language::English;
     let input = "Le texte français";
 
-    let data = translate_url(source, target, input, "https://libretranslate.de/", None).await.unwrap();
+    let data = translate_url(source, target, input, "https://libretranslate.de/", None)
+        .await
+        .unwrap();
 
     println!("URL: \"{}\"", data.url);
     println!("Input {}: \"{}\"", data.source.as_pretty(), data.input);

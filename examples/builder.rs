@@ -1,4 +1,4 @@
-use libretranslate::{TranslationBuilder, Language};
+use libretranslate::{Language, TranslationBuilder};
 
 #[tokio::main]
 async fn main() {

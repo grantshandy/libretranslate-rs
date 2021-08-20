@@ -74,22 +74,18 @@
 //!
 //! Here's a simple example.
 //! ```rust
-//! use libretranslate::Language;
+//! let lang = Language::English;
+//! let lang_parse = "english".parse::<Language>().unwrap();
 //!
-//! fn main() {
-//!     let lang = Language::English;
-//!     let lang_parse = "english".parse::<Language>().unwrap();
-//!
-//!     assert_eq!(lang, lang_parse);
-//!     assert_eq!("en", lang.as_code());
-//!     assert_eq!("English", lang.as_pretty());
-//! }
+//! assert_eq!(lang, lang_parse);
+//! assert_eq!("en", lang.as_code());
+//! assert_eq!("English", lang.as_pretty());
 //! ```
 //!
 //! [See In Examples Folder](https://github.com/grantshandy/libretranslate-rs/blob/main/examples/language.rs)
 //!
 //! ## String Methods
-//! The trait `Translate` implements [`AsRef<str>`](https://doc.rust-lang.org/std/convert/trait.AsRef.html), meaning that any `&str` or `String` can be translated into any other language. 
+//! The trait `Translate` implements [`AsRef<str>`](https://doc.rust-lang.org/std/convert/trait.AsRef.html), meaning that any `&str` or `String` can be translated into any other language.
 //!
 //! Here's a simple example.
 //! ```rust
@@ -142,24 +138,32 @@ pub struct Translation {
 }
 
 /// Translate text between two [`Language`](Language).
-pub async fn translate<T: AsRef<str>>(source: Language, target: Language, input: T, key: Option<T>) -> Result<Translation, TranslateError> {
+pub async fn translate<T: AsRef<str>>(
+    source: Language,
+    target: Language,
+    input: T,
+    key: Option<T>,
+) -> Result<Translation, TranslateError> {
     let url = "https://libretranslate.com/";
 
-    let key: Option<String> = match key {
-        Some(data) => Some(data.as_ref().to_string()),
-        None => None,
-    };
+    let key: Option<String> = key.map(|data| data.as_ref().to_string());
 
     let data = translate_url(source, target, input.as_ref(), url, key).await?;
 
-    return Ok(data);
+    Ok(data)
 }
 
 /// Translate using a custom URL.
-pub async fn translate_url<T: AsRef<str>>(source: Language, target: Language, input: T, url: T, key: Option<String>) -> Result<Translation, TranslateError> {
+pub async fn translate_url<T: AsRef<str>>(
+    source: Language,
+    target: Language,
+    input: T,
+    url: T,
+    key: Option<String>,
+) -> Result<Translation, TranslateError> {
     let complete_url: String;
 
-    if url.as_ref().chars().last().unwrap() == '/' {
+    if url.as_ref().ends_with('/') {
         complete_url = format!("{}translate", url.as_ref());
     } else {
         complete_url = format!("{}/translate", url.as_ref());
@@ -177,14 +181,14 @@ pub async fn translate_url<T: AsRef<str>>(source: Language, target: Language, in
                 "target": target.as_code(),
                 "api_key": key,
             })
-        },
+        }
         None => {
             serde_json::json!({
                 "q": input.as_ref(),
                 "source": source.as_code(),
                 "target": target.as_code(),
             })
-        },
+        }
     };
 
     let body = match surf::http::Body::from_json(&data) {
@@ -194,13 +198,11 @@ pub async fn translate_url<T: AsRef<str>>(source: Language, target: Language, in
 
     let url = complete_url.clone();
 
-    let res = match surf::post(complete_url)
-        .body(body)
-        .recv_string().await {
+    let res = match surf::post(complete_url).body(body).recv_string().await {
         Ok(data) => data,
         Err(error) => return Err(TranslateError::HttpError(error.to_string())),
     };
-    
+
     let parsed_json: Value = match serde_json::from_str(&res) {
         Ok(parsed_json) => parsed_json,
         Err(error) => {
@@ -208,10 +210,9 @@ pub async fn translate_url<T: AsRef<str>>(source: Language, target: Language, in
         }
     };
 
-    match &parsed_json["error"] {
-        Value::String(error) => return Err(TranslateError::ParseError(error.to_string())),
-        _ => (),
-    };
+    if let Value::String(error) = &parsed_json["error"] {
+        return Err(TranslateError::ParseError(error.to_string()));
+    }
 
     let output = match &parsed_json["translatedText"] {
         Value::String(output) => output,
@@ -225,13 +226,13 @@ pub async fn translate_url<T: AsRef<str>>(source: Language, target: Language, in
     let input = input.as_ref().to_string();
     let output = output.to_string();
 
-    return Ok(Translation {
+    Ok(Translation {
         url,
         source,
         target,
         input,
         output,
-    });
+    })
 }
 
 use std::str::FromStr;
@@ -435,7 +436,7 @@ impl<'a> Query<'a> {
     }
 
     pub fn url(mut self, url: &'a str) -> Query {
-        self.url = url.as_ref();
+        self.url = url;
         self
     }
 
@@ -499,7 +500,7 @@ impl TranslationBuilder {
         self.url = url.as_ref().to_string();
         self
     }
-    
+
     pub fn from_lang(mut self, lang: Language) -> Self {
         self.source = lang;
         self
@@ -521,7 +522,7 @@ impl TranslationBuilder {
     }
 
     pub async fn translate(mut self) -> Result<Translation, TranslateError> {
-        if self.input == "" {
+        if self.input.is_empty() {
             return Ok(Translation {
                 url: self.url,
                 source: self.source,
@@ -531,17 +532,29 @@ impl TranslationBuilder {
             });
         };
 
-        let data = translate_url(self.source, self.target, self.input.clone(), self.url.clone(), self.key).await?;
+        let data = translate_url(
+            self.source,
+            self.target,
+            self.input.clone(),
+            self.url.clone(),
+            self.key,
+        )
+        .await?;
 
         self.source = data.source;
         self.target = data.target;
 
-        return Ok(Translation {
+        Ok(Translation {
             url: self.url,
             source: self.source,
             target: self.target,
             input: self.input,
             output: data.output,
-        });
+        })
+    }
+}
+impl Default for TranslationBuilder {
+    fn default() -> Self {
+        Self::new()
     }
 }
