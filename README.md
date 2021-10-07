@@ -12,6 +12,17 @@ libretranslate = "0.5.1"
 
 `libretranslate` allows you to use open source machine translation in your projects through an easy to use API that connects to the official [webpage](https://libretranslate.com/).
 
+### Update for Oct, 2021
+As of now, [libretranslate.com] hasn't implemented rate limiting yet, so you must use an alternate instance or have an API key.
+
+Here are some that work:
+- [libretranslate.de](https://translate.argosopentech.com)
+- [translate.mentality.rip](https://translate.argosopentech.com)
+- [translate.astian.org](https://translate.argosopentech.com)
+- [translate.argosopentech.com](https://translate.argosopentech.com)
+
+You'll need to use a Builder struct or a String method and specify the url to change to an instance that doesn't require an API key.
+
 ## Basic Example
 `libretranslate` is an async library, so you'll have to use an async runtime like [`tokio`](https://crates.io/crates/tokio) or [`async-std`](https://crates.io/crates/async-std).
 
