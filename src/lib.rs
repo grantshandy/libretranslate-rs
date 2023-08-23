@@ -371,7 +371,7 @@ impl std::fmt::Display for Language {
             Language::Russian => write!(f, "ru"),
             Language::Spanish => write!(f, "es"),
             Language::Japanese => write!(f, "ja"),
-            Language::Polish => write!(f, "ja"),
+            Language::Polish => write!(f, "pl"),
         }
     }
 }
