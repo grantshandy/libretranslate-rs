@@ -7,7 +7,7 @@
 //!
 //! A LibreTranslate API client for Rust.
 //! ```
-//! libretranslate = "0.5.1"
+//! libretranslate = "0.5"
 //! ```
 //!
 //! `libretranslate` allows you to use open source machine translation in your projects through an easy to use API that connects to the official [webpage](https://libretranslate.com/).
@@ -124,7 +124,6 @@
 //! - Spanish
 //! - Polish
 //!
-//!! Written with love, in Rust by [Grant Handy](mailto://grantshandy@gmail.com).
 
 use serde_json::Value;
 

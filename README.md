@@ -137,5 +137,4 @@ Output: "Dies ist Text, geschrieben auf einem Computer, in Englisch."
 - Portuguese
 - Russian
 - Spanish
-
-Written with love, in Rust by [Grant Handy](mailto://grantshandy@gmail.com).
+- Polish
