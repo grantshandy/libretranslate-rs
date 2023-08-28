@@ -122,6 +122,7 @@
 //! - Portuguese
 //! - Russian
 //! - Spanish
+//! - Polish
 //!
 //!! Written with love, in Rust by [Grant Handy](mailto://grantshandy@gmail.com).
 
@@ -251,6 +252,7 @@ pub enum Language {
     Portuguese,
     Russian,
     Spanish,
+    Polish,
 }
 
 impl Language {
@@ -268,6 +270,7 @@ impl Language {
             Language::Portuguese => "pt",
             Language::Russian => "ru",
             Language::Spanish => "es",
+            Language::Polish => "pl",
         }
     }
 
@@ -285,6 +288,7 @@ impl Language {
             Language::Portuguese => "Portuguese",
             Language::Russian => "Russian",
             Language::Spanish => "Spanish",
+            Language::Polish => "pl",
         }
     }
 
@@ -307,6 +311,7 @@ impl Language {
             "ru" => Ok(Language::Russian),
             "es" => Ok(Language::Spanish),
             "ja" => Ok(Language::Japanese),
+            "pl" => Ok(Language::Polish),
             &_ => Err(LanguageError::FormatError("Unknown Language".to_string())),
         }
     }
@@ -334,6 +339,7 @@ impl FromStr for Language {
             "ru" => Ok(Language::Russian),
             "es" => Ok(Language::Spanish),
             "ja" => Ok(Language::Japanese),
+            "pl" => Ok(Language::Polish),
             "english" => Ok(Language::English),
             "arabic" => Ok(Language::Arabic),
             "chinese" => Ok(Language::Chinese),
@@ -344,6 +350,7 @@ impl FromStr for Language {
             "russian" => Ok(Language::Russian),
             "spanish" => Ok(Language::Spanish),
             "japanese" => Ok(Language::Japanese),
+            "polish" => Ok(Language::Polish),
             "auto" => Ok(Language::Detect),
             &_ => Err(LanguageError::FormatError(s.to_string())),
         }
@@ -364,6 +371,7 @@ impl std::fmt::Display for Language {
             Language::Russian => write!(f, "ru"),
             Language::Spanish => write!(f, "es"),
             Language::Japanese => write!(f, "ja"),
+            Language::Polish => write!(f, "pl"),
         }
     }
 }
