@@ -16,10 +16,9 @@ libretranslate = "0.5.1"
 As of now, [libretranslate.com](https://libretranslate.com) hasn't implemented rate limiting yet, so you must use an alternate instance or have an API key.
 
 Here are some that work:
-- [libretranslate.de](https://translate.argosopentech.com)
-- [translate.mentality.rip](https://translate.argosopentech.com)
-- [translate.astian.org](https://translate.argosopentech.com)
-- [translate.argosopentech.com](https://translate.argosopentech.com)
+- [translate.terraprint.co](https://translate.terraprint.co/) (Free)
+- [libretranslate.eownerdead.dedyn.io](https://libretranslate.eownerdead.dedyn.io/) (Free)
+- [libretranslate.com](https://libretranslate.com) (Paid)
 
 You'll need to use a Builder struct or a String method and specify the url to change to an instance that doesn't require an API key.
 
